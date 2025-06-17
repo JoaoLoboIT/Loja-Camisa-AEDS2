@@ -21,7 +21,7 @@ TCliente *leCliente(FILE *in);
 void imprimeCliente(TCliente *cliente);
 
 int tamanhoCliente();
-int tamanho_arquivo(FILE *arq);
+int tamanho_arquivo_Cliente(FILE *arq);
 
 TCliente *buscaSequencialCliente(int chave, FILE *in, FILE *log);
 TCliente *busca_binariaCliente(int chave, FILE *in, int inicio, int fim, FILE *log);
