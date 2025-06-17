@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
-#include "Clientes/TCliente.c"
+#include "../Clientes/TCliente.c"
+#include "../Camisa/TCamisa.c"
+
 
 int main()
 {
@@ -15,6 +17,7 @@ int main()
     FILE *log;
 
     TCliente *c1, *c2;
+    TCamisa *ka1, *ka2;
     int qtdparticoes;
 
     // TMetadados metadados;
@@ -39,9 +42,17 @@ int main()
 
     else
     {
+        criarBaseCamisa(arq, 5);
+        ImprimirBaseCamisa(arq);
+        
+        // ******************************************************************************************************************************
+        // CRIA E IMPRIME BASE DO CLIETE 
+        //criarBaseCliente(arq, 5);
+        //ImprimirBaseCliente(arq);
+        // ******************************************************************************************************************************
 
-        criarBase(arq, 5);
-        ImprimirBase(arq);
+
+        // ANOTAÇÕES TATIANA 
         // insertionSortContando(arq,tamanho_arquivo(arq), log);
         // classificacao_interna(arq, 10);
         // printf("\n-------------------------------------------------\n");
@@ -52,10 +63,23 @@ int main()
         // system("pause");
         // f = buscaSequencial(450000, arq, log);
         // imprime(f);
-        c1 = busca_binaria(3, arq, 0, tamanho_arquivo(arq) - 1, log);
-        imprime(c1);
-        c2 = buscaSequencial(3, arq, log);
-        imprime(c2);
+
+
+        // ******************************************************************************************************************************
+        // TESTE DE CLIENTES
+        // c1 = busca_binariaCliente(3, arq, 0, tamanho_arquivo(arq) - 1, log);
+        // imprimeCliente(c1);
+        // c2 = buscaSequencialCliente(3, arq, log);
+        // imprimeCliente(c2);
+        // ******************************************************************************************************************************
+        
+        ka1 = busca_binariaCamisa(2, arq, 0, tamanho_arquivo_Camisa(arq) - 1, log);
+        imprimeCamisa(ka1);
+        ka2 = buscaSequencialCamisa(3, arq, log);
+        imprimeCamisa(ka2);
+
+
+        // ANOTAÇÕES TATIANA
         // free(f);
         // insertionSort(arq,tamanho_arquivo(arq));
         // imprimirBase(arq);
@@ -63,5 +87,6 @@ int main()
         // printf("%d\n\n\n\n\n\n\n\n\n", qtdparticoes);
         // intercalacao_basica(out, qtdparticoes);
         // imprimirBase(out);
+        
     }
 }

@@ -1,0 +1,21 @@
+
+Comparacoes Binaria: 1 
+Tempo Binaria: 0.000000 
+Comparacoes Sequencial: 2 
+Tempo Sequencial: 0.000000 
+Comparacoes Binaria: 1 
+Tempo Binaria: 0.000000 
+Comparacoes Sequencial: 4 
+Tempo Sequencial: 0.000000 
+Comparacoes Binaria: 1 
+Tempo Binaria: 0.000000 
+Comparacoes Sequencial: 3 
+Tempo Sequencial: 0.000000 
+Comparacoes Binaria: 1 
+Tempo Binaria: 0.000000 
+Comparacoes Sequencial: 1 
+Tempo Sequencial: 0.000000 
+Comparacoes Binaria: 1 
+Tempo Binaria: 0.000000 
+Comparacoes Sequencial: 1 
+Tempo Sequencial: 0.000000 

@@ -19,7 +19,7 @@ TCliente *cliente(int cod, char *nome, int cpf)
 }
 
 // Salva cliente no arquivo out, na posicao atual do cursor
-void salva(TCliente *cliente, FILE *out)
+void salvaCliente(TCliente *cliente, FILE *out)
 {
     fwrite(&cliente->cod, sizeof(int), 1, out);
     // cliente->nome ao invés de &cliente->nome, pois string já é ponteiro
@@ -29,7 +29,7 @@ void salva(TCliente *cliente, FILE *out)
 
 // Le um cliente do arquivo in na posicao atual do cursor
 // Retorna um ponteiro para cliente lido do arquivo
-TCliente *le(FILE *in)
+TCliente *leCliente(FILE *in)
 {
     TCliente *cliente = (TCliente *)malloc(sizeof(TCliente));
     if (0 >= fread(&cliente->cod, sizeof(int), 1, in))
@@ -43,7 +43,7 @@ TCliente *le(FILE *in)
 }
 
 // Imprime cliente
-void imprime(TCliente *cliente)
+void imprimeCliente(TCliente *cliente)
 {
     printf("**********************************************");
     printf("\nCLiente de código ");
@@ -56,7 +56,7 @@ void imprime(TCliente *cliente)
 }
 
 // Retorna tamanho do cliente em bytes
-int tamanho()
+int tamanhoCliente()
 {
     return sizeof(int)         // cod
            + sizeof(char) * 50 // nome
@@ -64,13 +64,13 @@ int tamanho()
 }
 
 // Retorna a quantidade de registros no arquivo
-int tamanho_arquivo(FILE *arq) {
+int tamanho_arquivo_Cliente(FILE *arq) {
     fseek(arq, 0, SEEK_END);
-    int tam = trunc(ftell(arq) / tamanho());
+    int tam = trunc(ftell(arq) / tamanhoCliente());
     return tam;
 }
 
-TCliente *buscaSequencial(int chave, FILE *in, FILE *log){
+TCliente *buscaSequencialCliente(int chave, FILE *in, FILE *log){
 
     TCliente *c;
     int achou;
@@ -82,7 +82,7 @@ TCliente *buscaSequencial(int chave, FILE *in, FILE *log){
 
     inicio = clock();
 
-    while ((c = le(in)) != NULL){
+    while ((c = leCliente(in)) != NULL){
 
         cont ++;
 
@@ -109,7 +109,7 @@ TCliente *buscaSequencial(int chave, FILE *in, FILE *log){
         free(c);
 }
 
-TCliente *busca_binaria(int chave, FILE *in, int inicio, int fim, FILE *log) {
+TCliente *busca_binariaCliente(int chave, FILE *in, int inicio, int fim, FILE *log) {
 
     TCliente *c = NULL;
     int cod = -1;
@@ -123,8 +123,8 @@ TCliente *busca_binaria(int chave, FILE *in, int inicio, int fim, FILE *log) {
 
         int meio = trunc((inicio + fim) / 2);
         //printf("Inicio: %d; Fim: %d; Meio: %d\n", inicio, fim, meio);
-        fseek(in, (meio -1) * tamanho(), SEEK_SET);
-        c = le(in);
+        fseek(in, (meio -1) * tamanhoCliente(), SEEK_SET);
+        c = leCliente(in);
         cod = c->cod;
 
         cont ++;
@@ -148,7 +148,7 @@ TCliente *busca_binaria(int chave, FILE *in, int inicio, int fim, FILE *log) {
     else return NULL;
 }
 
-void criarBase(FILE *out, int tam){
+void criarBaseCliente(FILE *out, int tam){
     int vet[tam];
     TCliente *c;
 
@@ -157,29 +157,29 @@ void criarBase(FILE *out, int tam){
     }
 
     //shuffle(vet, tam, (tam*60)/100);
-    embaralha(vet, tam);                   
+    embaralhaCliente(vet, tam);                   
 
     printf("\nGerando a base de dados...\n");
 
     for(int i = 0; i<tam; i++){
         c = cliente(vet[i], "A", 111);
-        salva(c, out);
+        salvaCliente(c, out);
     }
     free(c);
 }
 
-void ImprimirBase(FILE *out){
+void ImprimirBaseCliente(FILE *out){
     printf("\nImprimindo a base de dados...\n");
     rewind(out);
     TCliente *c;
 
-    while((c = le(out)) != NULL){
-        imprime(c);
+    while((c = leCliente(out)) != NULL){
+        imprimeCliente(c);
     }
     free(c);
 }
 
-void embaralha(int *vet, int tam) {
+void embaralhaCliente(int *vet, int tam) {
     int tmp;
     srand(time(NULL));
     int trocas = (tam*60)/100;
