@@ -19,5 +19,12 @@ TCliente *le(FILE *in);
 
 // Imprime cliente
 void imprime(TCliente *cliente);
-
 int tamanho_arquivo(FILE *arq);
+
+TCliente *buscaSequencial(int chave, FILE *in, FILE *log);
+TCliente *busca_binaria(int chave, FILE *in, int inicio, int fim, FILE *log);
+
+void criarBase(FILE *out, int tam);
+void ImprimirBase(FILE *out);
+void embaralha(int *vet, int tam);
+
