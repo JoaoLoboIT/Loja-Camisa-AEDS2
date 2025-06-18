@@ -5,6 +5,7 @@
 #include <time.h>
 #include "../Clientes/TCliente.c"
 #include "../Camisa/TCamisa.c"
+#include <math.h>
 
 
 // Cria um pedido. Lembrar de usar free(pedido)

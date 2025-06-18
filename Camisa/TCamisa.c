@@ -118,6 +118,7 @@ TCamisa *buscaSequencialCamisa(int chave, FILE *in, FILE *log)
     }
 
     free(ka);
+    return NULL;
 }
 
 TCamisa *busca_binariaCamisa(int chave, FILE *in, int inicio, int fim, FILE *log)
@@ -184,7 +185,7 @@ void criarBaseCamisa(FILE *out, int tam)
 
     for (int i = 0; i < tam; i++)
     {
-        ka = camisa(vet[i], 1, "1980", "Cruzeiro");
+        ka = camisa(vet[i], 1, "2003", "Cruzeiro");
         salvaCamisa(ka, out);
     }
     free(ka);

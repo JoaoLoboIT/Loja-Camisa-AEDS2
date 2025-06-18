@@ -5,6 +5,18 @@
 #include "../Clientes/TCliente.c"
 #include "../Camisa/TCamisa.c"
 
+void menu()
+{
+    printf("\nEscolha uma opção:\n");
+    printf("1 - Imprimir base de Camisas\n");
+    printf("2 - Imprimir base de Cliente\n");
+    printf("3 - Fazer busca sequencial de Camisas\n");
+    printf("4 - Fazer busca binária de Camisas\n");
+    printf("5 - Fazer busca sequencial de Clientes\n");
+    printf("6 - Fazer busca binária de Clientes\n");
+    printf("0 - Sair\n");
+    printf("Digite a opção desejada: ");
+}
 
 int main()
 {
@@ -12,81 +24,131 @@ int main()
     system("chcp 65001");
 #endif
 
-    FILE *arq;
-    FILE *out;
+    FILE *arqClientes = fopen("cliente.dat", "w+b");
+    FILE *arqCamisas = fopen("camisa.dat", "w+b");
+    FILE *arqPedidos = fopen("pedido.dat", "w+b");
     FILE *log;
 
-    TCliente *c1, *c2;
-    TCamisa *ka1, *ka2;
-    int qtdparticoes;
-
-    // TMetadados metadados;
-    // metadados.topo_vagos = -1;
-
-    /*if ((out = fopen("intercalado.dat", "w+b")) == NULL) {
-        printf("Erro ao abrir arquivo\n");
-        exit(1);
-    }*/
-
-    if ((log = fopen("log.txt", "a+")) == NULL)
+    if (arqClientes == NULL || arqCamisas == NULL || arqPedidos == NULL)
     {
-        printf("Erro ao abrir arquivo\n");
+        printf("Erro ao abrir um dos arquivos\n");
         exit(1);
     }
 
-    if ((arq = fopen("cliente.dat", "w+b")) == NULL)
+    // Definir tamanho da base
+    int TAMANHO_BASE;
+
+    printf("Qual o tamanho da base de dados (clientes e camisas)? ");
+    scanf("%d", &TAMANHO_BASE); // Solicita ao usuário o tamanho da base
+
+    // Cria base de Camisas e Clientes
+    criarBaseCamisa(arqCamisas, TAMANHO_BASE);
+    // ImprimirBaseCamisa(arqCamisas);
+    criarBaseCliente(arqClientes, TAMANHO_BASE);
+
+    int opcao;
+    do
     {
-        printf("Erro ao abrir arquivo\n");
-        exit(1);
-    }
+        menu();
+        scanf("%d", &opcao);
 
-    else
-    {
-        criarBaseCamisa(arq, 5);
-        ImprimirBaseCamisa(arq);
+        switch (opcao)
+        {
+        case 1:
+            ImprimirBaseCamisa(arqCamisas);
+            break;
+
+        case 2:
+            ImprimirBaseCliente(arqClientes);
+            break;
+
+        case 3:
+            TCamisa *ka1;
+            int aux1;
+
+            printf("Digite o código da camisa para buscar: ");
+            scanf("%d", &aux1);
+
+            // Buscar e imprimir camisas
+            ka1 = buscaSequencialCamisa(aux1, arqCamisas, log);
+            if (ka1 != NULL)
+            {
+                imprimeCamisa(ka1); // Imprime a camisa encontrada
+            }
+            else
+            {
+                printf("\nCamisa não encontrada!\n"); // Mensagem quando não encontrar a camisa
+            }
+            break;
+
+        case 4:
+            TCamisa *ka2;
+            int aux2;
+
+            printf("Digite o código da camisa para buscar: ");
+            scanf("%d", &aux2);
+
+            // Buscar e imprimir camisas
+            ka2 = busca_binariaCamisa(aux2, arqCamisas, 0, tamanho_arquivo_Camisa(arqCamisas) - 1, log);
+            if (ka2 != NULL)
+            {
+                imprimeCamisa(ka2); // Imprime a camisa encontrada
+            }
+            else
+            {
+                printf("\nCamisa não encontrada!\n"); // Mensagem quando não encontrar a camisa
+            }
+            break;
+
+        case 5:
+            TCliente *c1;
+            int aux3;
+
+            printf("Digite o código do cliente para buscar: ");
+            scanf("%d", &aux3);
+            c1 = buscaSequencialCliente(aux3, arqClientes, log);
+            if (c1 != NULL)
+            {
+                imprimeCliente(c1);
+            }
+            else
+            {
+                printf("\nCliente não encontrado!\n");
+            }
+            break;
         
-        // ******************************************************************************************************************************
-        // CRIA E IMPRIME BASE DO CLIETE 
-        //criarBaseCliente(arq, 5);
-        //ImprimirBaseCliente(arq);
-        // ******************************************************************************************************************************
+        case 6:
+            TCliente *c2;
+            int aux4;
 
+            printf("Digite o código do cliente para buscar: ");
+            scanf("%d", &aux4);
+            c2 = busca_binariaCliente(aux4, arqClientes, 0, tamanho_arquivo_Cliente(arqClientes) - 1, log);
+            if (c2 != NULL)
+            {
+                imprimeCliente(c2);
+            }
+            else
+            {
+                printf("\nCliente não encontrado!\n");
+            }
+            break;
 
-        // ANOTAÇÕES TATIANA 
-        // insertionSortContando(arq,tamanho_arquivo(arq), log);
-        // classificacao_interna(arq, 10);
-        // printf("\n-------------------------------------------------\n");
-        // printf("\nCLASSIFICAÇÃO DEPOIS DO INSERTION\n");
-        // printf("\n-------------------------------------------------\n");
-        // ImprimirBase(arq);
-        // printf("\n\n\nORDENANDO ORDENANDO ORDENANDO ORDENANDO ORDENANDO ORDENANDO ORDENANDO\n\n\n");
-        // system("pause");
-        // f = buscaSequencial(450000, arq, log);
-        // imprime(f);
+        case 0:
+            printf("Saindo...\n");
+            break;
 
+        default:
+            printf("Opção inválida! Tente novamente.\n");
+            break;
+        }
+    } while (opcao != 0);
 
-        // ******************************************************************************************************************************
-        // TESTE DE CLIENTES
-        // c1 = busca_binariaCliente(3, arq, 0, tamanho_arquivo(arq) - 1, log);
-        // imprimeCliente(c1);
-        // c2 = buscaSequencialCliente(3, arq, log);
-        // imprimeCliente(c2);
-        // ******************************************************************************************************************************
-        
-        ka1 = busca_binariaCamisa(2, arq, 0, tamanho_arquivo_Camisa(arq) - 1, log);
-        imprimeCamisa(ka1);
-        ka2 = buscaSequencialCamisa(3, arq, log);
-        imprimeCamisa(ka2);
+    // Fechar arquivos
+    fclose(arqClientes);
+    fclose(arqCamisas);
+    fclose(arqPedidos);
+    fclose(log);
 
-
-        // ANOTAÇÕES TATIANA
-        // free(f);
-        // insertionSort(arq,tamanho_arquivo(arq));
-        // imprimirBase(arq);
-        // qtdparticoes = classificacao_interna(arq, 10);
-        // printf("%d\n\n\n\n\n\n\n\n\n", qtdparticoes);
-        // intercalacao_basica(out, qtdparticoes);
-        // imprimirBase(out);
-        
-    }
+    return 0;
 }

@@ -107,6 +107,7 @@ TCliente *buscaSequencialCliente(int chave, FILE *in, FILE *log){
         }
 
         free(c);
+        return NULL;
 }
 
 TCliente *busca_binariaCliente(int chave, FILE *in, int inicio, int fim, FILE *log) {
@@ -162,7 +163,7 @@ void criarBaseCliente(FILE *out, int tam){
     printf("\nGerando a base de dados...\n");
 
     for(int i = 0; i<tam; i++){
-        c = cliente(vet[i], "A", 111);
+        c = cliente(vet[i], "Fulano", 111*i);
         salvaCliente(c, out);
     }
     free(c);
