@@ -188,19 +188,6 @@ TPedido *busca_binariaPedido(int chave, FILE *in, int inicio, int fim, FILE *log
     }
 }
 
-// Cria a base de dados de pedidos ------------ ERRADO!!! vou ter q criar um vetor de Camisas e Clientes
-void criarBasePedido(FILE *out, int tam, TCliente *clientes, TCamisa *camisas)
-{
-    TPedido *p;
-
-    for (int i = 0; i < tam; i++)
-    {
-        p = pedido(i + 1, &clientes[i], &camisas[i]);
-        salvaPedido(p, out);
-        free(p);
-    }
-}
-
 // Imprime a base de dados de pedidos
 void ImprimirBasePedido(FILE *out)
 {

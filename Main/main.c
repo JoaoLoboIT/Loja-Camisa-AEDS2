@@ -14,6 +14,8 @@ void menu()
     printf("4 - Fazer busca binária de Camisas\n");
     printf("5 - Fazer busca sequencial de Clientes\n");
     printf("6 - Fazer busca binária de Clientes\n");
+    printf("7 - Criar Cliente\n");
+    printf("8 - Criar Camisa\n");
     printf("0 - Sair\n");
     printf("Digite a opção desejada: ");
 }
@@ -116,7 +118,7 @@ int main()
                 printf("\nCliente não encontrado!\n");
             }
             break;
-        
+
         case 6:
             TCliente *c2;
             int aux4;
@@ -132,6 +134,55 @@ int main()
             {
                 printf("\nCliente não encontrado!\n");
             }
+            break;
+
+        case 7:
+            int cod1, cpf;
+            char nome[50];
+
+            // Solicitar informações do novo cliente
+            printf("Digite o código do cliente: ");
+            scanf("%d", &cod1);
+            printf("Digite o nome do cliente: ");
+            getchar();                        // Limpar o buffer do teclado
+            fgets(nome, sizeof(nome), stdin); // Captura o nome com espaços
+            nome[strcspn(nome, "\n")] = '\0'; // Remove o caractere de nova linha, se existir
+            printf("Digite o CPF do cliente: ");
+            scanf("%d", &cpf);
+
+            // Criar o novo cliente e salvar no arquivo
+            TCliente *cNovo = cliente(cod1, nome, cpf);
+            salvaCliente(cNovo, arqClientes);
+
+            printf("Novo cliente criado com sucesso!\n");
+            imprimeCliente(cNovo);
+            free(cNovo); // Libera a memória alocada para o novo cliente
+            break;
+
+        case 8:
+            int cod2, tipo;
+            char ano[20], time[20];
+
+            // Solicitar informações da nova camisa
+            printf("Digite o código da camisa: ");
+            scanf("%d", &cod2);
+            printf("Digite o tipo da camisa: ");
+            scanf("%d", &tipo);
+            printf("Digite o ano da camisa: ");
+            getchar();                      // Limpar o buffer do teclado
+            fgets(ano, sizeof(ano), stdin); // Captura o ano com espaços
+            ano[strcspn(ano, "\n")] = '\0'; // Remove o caractere de nova linha, se existir
+            printf("Digite o time da camisa: ");
+            fgets(time, sizeof(time), stdin); // Captura o time com espaços
+            time[strcspn(time, "\n")] = '\0'; // Remove o caractere de nova linha, se existir
+
+            // Criar a nova camisa e salvar no arquivo
+            TCamisa *kaNovo = camisa(cod2, tipo, ano, time);
+            salvaCamisa(kaNovo, arqCamisas);
+
+            printf("Nova camisa criada com sucesso!\n");
+            imprimeCamisa(kaNovo);
+            free(kaNovo);
             break;
 
         case 0:

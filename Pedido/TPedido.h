@@ -33,9 +33,6 @@ TPedido *buscaSequencialPedido(int chave, FILE *in, FILE *log);
 // Busca binária de um pedido no arquivo
 TPedido *busca_binariaPedido(int chave, FILE *in, int inicio, int fim, FILE *log);
 
-// Cria a base de dados de pedidos
-void criarBasePedido(FILE *out, int tam, TCliente *clientes, TCamisa *camisas);
-
 // Imprime a base de dados de pedidos
 void ImprimirBasePedido(FILE *out);
 
