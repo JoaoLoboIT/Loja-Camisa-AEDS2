@@ -12,6 +12,12 @@ void menu()
     printf("7 - Criar Cliente\n");
     printf("8 - Criar Camisa\n");
     printf("9 - Criar Pedido\n");
+    printf("10 - Imprimir bases de pedidos\n");
+    printf("11 - Fazer busca sequencial pedido\n");
+    printf("12 - Fazer busca binaria pedido\n");
+    printf("13 - Ordenar base cliente\n");
+    printf("14 - Ordenar base camisa\n");
+    printf("15 - ordenar base pedido\n");
     printf("0 - Sair\n");
     printf("Digite a opção desejada: ");
 }
@@ -56,13 +62,7 @@ int main()
     // Cria base de Camisas e Clientes
     criarBaseCamisa(arqCamisas, TAMANHO_BASE);
     criarBaseCliente(arqClientes, TAMANHO_BASE);
-    TCamisa *ka = camisa(0, 0, "", "");
-    salvaCamisa(ka, arqCamisas);
-    TCliente *c = cliente(0, "", 0);
-    salvaCliente(c, arqClientes);
-
-    TPedido *pedido1 = pedido(0, c, ka);
-
+    
     int opcao;
     do
     {
@@ -269,7 +269,63 @@ int main()
         }
         case 10:
         {
-            imprimePedido(pedido1);
+            ImprimirBasePedido(arqPedidos);
+            break;
+        }
+        case 11:
+        {
+            TPedido *p1;
+            int codBusca;
+
+            printf("Digite o código do pedido para buscar (sequencial): ");
+            scanf("%d", &codBusca);
+
+            p1 = buscaSequencialPedido(codBusca, arqPedidos, log);
+            if (p1 != NULL)
+            {
+                imprimePedido(p1);
+                free(p1);
+            }
+            else
+            {
+                printf("\nPedido não encontrado!\n");
+            }
+            break;
+        }
+        case 12:
+        {
+            TPedido *p2;
+            int codBusca;
+
+            printf("Digite o código do pedido para buscar (binária): ");
+            scanf("%d", &codBusca);
+
+            p2 = busca_binariaPedido(codBusca, arqPedidos, 0, tamanho_arquivo_Pedido(arqPedidos) - 1, log);
+            if (p2 != NULL)
+            {
+                imprimePedido(p2);
+                free(p2);
+            }
+            else
+            {
+                printf("\nPedido não encontrado!\n");
+            }
+            break;
+        }
+        case 13:
+        {
+
+
+            break;
+        }
+        case 14:
+        {
+
+            break;
+        }
+        case 15:
+        {
+
             break;
         }
 
