@@ -1,9 +1,0 @@
-
-Comparacoes Binaria: 1 
-Tempo Binaria: 0.000000 
-Comparacoes Sequencial: 5 
-Tempo Sequencial: 0.000000 
-Comparacoes Binaria: 1 
-Tempo Binaria: 0.000000 
-Comparacoes Sequencial: 3 
-Tempo Sequencial: 0.000000 
