@@ -1,5 +1,0 @@
-
-Comparacoes Sequenciais: 2 
-Tempo Sequencial: 0.000000 
-Comparacoes Sequenciais: 2 
-Tempo Sequencial: 0.000000 

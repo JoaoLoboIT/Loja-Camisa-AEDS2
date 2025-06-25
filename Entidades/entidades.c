@@ -199,6 +199,61 @@ void embaralhaCliente(int *vet, int tam) {
     }
 }
 
+void ShellsortCliente(FILE *arq, int tam) {
+    int h = 1;
+    
+    // Encontrar o maior valor de h possível (sequência de Knuth: h = 3*h + 1)
+    do {
+        h = h * 3 + 1;
+    } while (h < tam);
+
+    // Realiza a ordenação com a técnica de Shell Sort
+    do {
+        h /= 3;
+        
+        // Para cada elemento a partir da posição h+1
+        for (int j = h + 1; j <= tam; j++) {
+            // Lê o registro j (elemento a ser inserido)
+            fseek(arq, (j - 1) * tamanhoCliente(), SEEK_SET);
+            TCliente *fj = leCliente(arq);
+            
+            int i = j - h;
+            
+            // Lê o registro i (para comparação)
+            fseek(arq, (i - 1) * tamanhoCliente(), SEEK_SET);
+            TCliente *fi = leCliente(arq);
+
+            // Move elementos maiores que fj para a direita (com intervalo h)
+            while (i > 0 && fi->cod > fj->cod) {
+                // Move fi para a posição i + h
+                fseek(arq, (i + h - 1) * tamanhoCliente(), SEEK_SET);
+                salvaCliente(fi, arq);
+                
+                // Próxima posição a verificar
+                i -= h;
+                
+                // Se ainda há elementos para verificar, lê o próximo
+                if (i > 0) {
+                    free(fi); // Libera a memória do registro anterior
+                    fseek(arq, (i - 1) * tamanhoCliente(), SEEK_SET);
+                    fi = leCliente(arq);
+                }
+            }
+            
+            // Posiciona no local correto para salvar o registro j
+            fseek(arq, (i + h - 1) * tamanhoCliente(), SEEK_SET);
+            salvaCliente(fj, arq);
+            
+            // Libera memória
+            free(fj);
+            if (i > 0) free(fi);
+        }
+    } while (h > 1);
+    
+    // Descarrega o buffer para garantir que os dados sejam salvos
+    fflush(arq);
+}
+
 /*//////////////////////////////////////////////////////////////////////////////*/
 //                                                                            //
 //                         Funções TCamisa                                    //
@@ -419,6 +474,62 @@ void embaralhaCamisa(int *vet, int tam) {
     }
 }
 
+// Shell Sort para TCamisa
+void ShellsortCamisa(FILE *arq, int tam) {
+    int h = 1;
+    
+    // Encontrar o maior valor de h possível (sequência de Knuth: h = 3*h + 1)
+    do {
+        h = h * 3 + 1;
+    } while (h < tam);
+
+    // Realiza a ordenação com a técnica de Shell Sort
+    do {
+        h /= 3;
+        
+        // Para cada elemento a partir da posição h+1
+        for (int j = h + 1; j <= tam; j++) {
+            // Lê o registro j (elemento a ser inserido)
+            fseek(arq, (j - 1) * tamanhoCamisa(), SEEK_SET);
+            TCamisa *fj = leCamisa(arq);
+            
+            int i = j - h;
+            
+            // Lê o registro i (para comparação)
+            fseek(arq, (i - 1) * tamanhoCamisa(), SEEK_SET);
+            TCamisa *fi = leCamisa(arq);
+
+            // Move elementos maiores que fj para a direita (com intervalo h)
+            while (i > 0 && fi->cod > fj->cod) {
+                // Move fi para a posição i + h
+                fseek(arq, (i + h - 1) * tamanhoCamisa(), SEEK_SET);
+                salvaCamisa(fi, arq);
+                
+                // Próxima posição a verificar
+                i -= h;
+                
+                // Se ainda há elementos para verificar, lê o próximo
+                if (i > 0) {
+                    free(fi); // Libera a memória do registro anterior
+                    fseek(arq, (i - 1) * tamanhoCamisa(), SEEK_SET);
+                    fi = leCamisa(arq);
+                }
+            }
+            
+            // Posiciona no local correto para salvar o registro j
+            fseek(arq, (i + h - 1) * tamanhoCamisa(), SEEK_SET);
+            salvaCamisa(fj, arq);
+            
+            // Libera memória
+            free(fj);
+            if (i > 0) free(fi);
+        }
+    } while (h > 1);
+    
+    // Descarrega o buffer para garantir que os dados sejam salvos
+    fflush(arq);
+}
+
 /*//////////////////////////////////////////////////////////////////////////////*/
 //                                                                            //
 //                         Funções TPedido                                    //
@@ -633,5 +744,60 @@ void embaralhaPedido(int *vet, int tam) {
     }
 }
 
+// Shell Sort para TPedido
+void ShellsortPedido(FILE *arq, int tam) {
+    int h = 1;
+    
+    // Encontrar o maior valor de h possível (sequência de Knuth: h = 3*h + 1)
+    do {
+        h = h * 3 + 1;
+    } while (h < tam);
+
+    // Realiza a ordenação com a técnica de Shell Sort
+    do {
+        h /= 3;
+        
+        // Para cada elemento a partir da posição h+1
+        for (int j = h + 1; j <= tam; j++) {
+            // Lê o registro j (elemento a ser inserido)
+            fseek(arq, (j - 1) * tamanhoPedido(), SEEK_SET);
+            TPedido *fj = lePedido(arq);
+            
+            int i = j - h;
+            
+            // Lê o registro i (para comparação)
+            fseek(arq, (i - 1) * tamanhoPedido(), SEEK_SET);
+            TPedido *fi = lePedido(arq);
+
+            // Move elementos maiores que fj para a direita (com intervalo h)
+            while (i > 0 && fi->cod > fj->cod) {
+                // Move fi para a posição i + h
+                fseek(arq, (i + h - 1) * tamanhoPedido(), SEEK_SET);
+                salvaPedido(fi, arq);
+                
+                // Próxima posição a verificar
+                i -= h;
+                
+                // Se ainda há elementos para verificar, lê o próximo
+                if (i > 0) {
+                    free(fi); // Libera a memória do registro anterior
+                    fseek(arq, (i - 1) * tamanhoPedido(), SEEK_SET);
+                    fi = lePedido(arq);
+                }
+            }
+            
+            // Posiciona no local correto para salvar o registro j
+            fseek(arq, (i + h - 1) * tamanhoPedido(), SEEK_SET);
+            salvaPedido(fj, arq);
+            
+            // Libera memória
+            free(fj);
+            if (i > 0) free(fi);
+        }
+    } while (h > 1);
+    
+    // Descarrega o buffer para garantir que os dados sejam salvos
+    fflush(arq);
+}
 
 #endif

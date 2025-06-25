@@ -24,9 +24,9 @@ void menu()
 
 int main()
 {
-    #ifdef _WIN32
+#ifdef _WIN32
     system("chcp 65001"); // Configura a codificação para UTF-8
-    #endif
+#endif
 
     FILE *arqClientes = fopen("dat/cliente.dat", "r+b");
     if (arqClientes == NULL)
@@ -62,7 +62,7 @@ int main()
     // Cria base de Camisas e Clientes
     criarBaseCamisa(arqCamisas, TAMANHO_BASE);
     criarBaseCliente(arqClientes, TAMANHO_BASE);
-    
+
     int opcao;
     do
     {
@@ -315,17 +315,23 @@ int main()
         case 13:
         {
 
-
+            int tamanho_base_clientes = tamanho_arquivo_Cliente(arqClientes);
+            ShellsortCliente(arqClientes, tamanho_base_clientes);
+            printf("\nBase de clientes ordenada com sucesso!\n");
             break;
         }
         case 14:
         {
-
+            int tamanho_base_camisas = tamanho_arquivo_Camisa(arqCamisas);
+            ShellsortCamisa(arqCamisas, tamanho_base_camisas);
+            printf("\nBase de camisas ordenada com sucesso!\n");
             break;
         }
         case 15:
         {
-
+            int tamanho_base_pedidos = tamanho_arquivo_Pedido(arqPedidos);
+            ShellsortPedido(arqPedidos, tamanho_base_pedidos);
+            printf("Base de pedidos ordenada com sucesso!\n");
             break;
         }
 

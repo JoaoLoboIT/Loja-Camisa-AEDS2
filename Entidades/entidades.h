@@ -56,6 +56,8 @@ void criarBaseCamisa(FILE *out, int tam);
 void ImprimirBaseCamisa(FILE *out);
 void embaralhaCamisa(int *vet, int tam);
 
+void ShellsortCamisa(FILE *arq, int tam);
+
 
 /*//////////////////////////////////////////////////////////////////////////////*/
 //                                                                            //
@@ -84,6 +86,8 @@ TCliente *busca_binariaCliente(int chave, FILE *in, int inicio, int fim, FILE *l
 void criarBaseCliente(FILE *out, int tam);
 void ImprimirBaseCliente(FILE *out);
 void embaralhaCliente(int *vet, int tam);
+
+void ShellsortCliente(FILE *arq, int tam);
 
 /*//////////////////////////////////////////////////////////////////////////////*/
 //                                                                            //
@@ -119,6 +123,8 @@ TPedido *busca_binariaPedido(int chave, FILE *in, int inicio, int fim, FILE *log
 void ImprimirBasePedido(FILE *out);
 
 void embaralhaPedido(int *vet, int tam);
+
+void ShellsortPedido(FILE *arq, int tam);
 
 
 #endif 
