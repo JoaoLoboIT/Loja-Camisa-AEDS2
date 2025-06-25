@@ -65,17 +65,19 @@ int tamanhoCliente()
 {
     return sizeof(int)         // cod
            + sizeof(char) * 50 // nome
-           + sizeof(int);   // cpf
+           + sizeof(int);      // cpf
 }
 
 // Retorna a quantidade de registros no arquivo
-int tamanho_arquivo_Cliente(FILE *arq) {
+int tamanho_arquivo_Cliente(FILE *arq)
+{
     fseek(arq, 0, SEEK_END);
     int tam = trunc(ftell(arq) / tamanhoCliente());
     return tam;
 }
 
-TCliente *buscaSequencialCliente(int chave, FILE *in, FILE *log){
+TCliente *buscaSequencialCliente(int chave, FILE *in, FILE *log)
+{
 
     TCliente *c;
     int achou;
@@ -87,35 +89,40 @@ TCliente *buscaSequencialCliente(int chave, FILE *in, FILE *log){
 
     inicio = clock();
 
-    while ((c = leCliente(in)) != NULL){
+    while ((c = leCliente(in)) != NULL)
+    {
 
-        cont ++;
+        cont++;
 
-        if(c->cod == chave){
-           achou = 1;
-           break;
+        if (c->cod == chave)
+        {
+            achou = 1;
+            break;
         }
     }
-        if(achou == 1){
-            fprintf(log, "\nComparacoes Sequencial: %d ", cont);
-            fim = clock();
-            total = (fim - inicio)/CLOCKS_PER_SEC;
-            fprintf(log, "\nTempo Sequencial: %f ", total);
-            return c;
-        }
+    if (achou == 1)
+    {
+        fprintf(log, "\nComparacoes Sequencial: %d ", cont);
+        fim = clock();
+        total = (fim - inicio) / CLOCKS_PER_SEC;
+        fprintf(log, "\nTempo Sequencial: %f ", total);
+        return c;
+    }
 
-        else {
-            fprintf(log, "Comparacoes Sequencial: %d ", cont);
-            fim = clock();
-            total = (fim - inicio)/CLOCKS_PER_SEC;
-            fprintf(log, "Tempo Sequencial: %f ", cont);
-        }
+    else
+    {
+        fprintf(log, "Comparacoes Sequencial: %d ", cont);
+        fim = clock();
+        total = (fim - inicio) / CLOCKS_PER_SEC;
+        fprintf(log, "Tempo Sequencial: %f ", cont);
+    }
 
-        free(c);
-        return NULL;
+    free(c);
+    return NULL;
 }
 
-TCliente *busca_binariaCliente(int chave, FILE *in, int inicio, int fim, FILE *log) {
+TCliente *busca_binariaCliente(int chave, FILE *in, int inicio, int fim, FILE *log)
+{
 
     TCliente *c = NULL;
     int cod = -1;
@@ -125,72 +132,86 @@ TCliente *busca_binariaCliente(int chave, FILE *in, int inicio, int fim, FILE *l
 
     inicioT = clock();
 
-    while (inicio <= fim && cod != chave) {
+    while (inicio <= fim && cod != chave)
+    {
 
         int meio = trunc((inicio + fim) / 2);
-        //printf("Inicio: %d; Fim: %d; Meio: %d\n", inicio, fim, meio);
-        fseek(in, (meio -1) * tamanhoCliente(), SEEK_SET);
+        // printf("Inicio: %d; Fim: %d; Meio: %d\n", inicio, fim, meio);
+        fseek(in, (meio - 1) * tamanhoCliente(), SEEK_SET);
         c = leCliente(in);
         cod = c->cod;
 
-        cont ++;
+        cont++;
 
-        if (c) {
-            if (cod > chave) {
+        if (c)
+        {
+            if (cod > chave)
+            {
                 fim = meio - 1;
-            } else {
+            }
+            else
+            {
                 inicio = meio + 1;
             }
         }
     }
 
-    if (cod == chave) {
+    if (cod == chave)
+    {
         fprintf(log, "\nComparacoes Binaria: %d ", cont);
         fimT = clock();
-        total = (fimT - inicioT)/CLOCKS_PER_SEC;
+        total = (fimT - inicioT) / CLOCKS_PER_SEC;
         fprintf(log, "\nTempo Binaria: %f ", total);
         return c;
     }
-    else return NULL;
+    else
+        return NULL;
 }
 
-void criarBaseCliente(FILE *out, int tam){
+void criarBaseCliente(FILE *out, int tam)
+{
     int vet[tam];
     TCliente *c;
 
-    for(int i = 0; i < tam; i++){
+    for (int i = 0; i < tam; i++)
+    {
         vet[i] = i + 1;
     }
 
-    //shuffle(vet, tam, (tam*60)/100);
-    embaralhaCliente(vet, tam);                   
+    // shuffle(vet, tam, (tam*60)/100);
+    embaralhaCliente(vet, tam);
 
     printf("\nGerando a base de dados...\n");
 
-    for(int i = 0; i<tam; i++){
-        c = cliente(vet[i], "Fulano", 111*i);
+    for (int i = 0; i < tam; i++)
+    {
+        c = cliente(vet[i], "Fulano", 111 * i);
         salvaCliente(c, out);
     }
     free(c);
 }
 
-void ImprimirBaseCliente(FILE *out){
+void ImprimirBaseCliente(FILE *out)
+{
     printf("\nImprimindo a base de dados...\n");
     rewind(out);
     TCliente *c;
 
-    while((c = leCliente(out)) != NULL){
+    while ((c = leCliente(out)) != NULL)
+    {
         imprimeCliente(c);
     }
     free(c);
 }
 
-void embaralhaCliente(int *vet, int tam) {
+void embaralhaCliente(int *vet, int tam)
+{
     int tmp;
     srand(time(NULL));
-    int trocas = (tam*60)/100;
+    int trocas = (tam * 60) / 100;
 
-    for(int t = 1; t < trocas; t++){
+    for (int t = 1; t < trocas; t++)
+    {
         int i = rand() % tam;
         int j = rand() % tam;
         tmp = vet[i];
@@ -199,57 +220,64 @@ void embaralhaCliente(int *vet, int tam) {
     }
 }
 
-void ShellsortCliente(FILE *arq, int tam) {
+void ShellsortCliente(FILE *arq, int tam)
+{
     int h = 1;
-    
+
     // Encontrar o maior valor de h possível (sequência de Knuth: h = 3*h + 1)
-    do {
+    do
+    {
         h = h * 3 + 1;
     } while (h < tam);
 
     // Realiza a ordenação com a técnica de Shell Sort
-    do {
+    do
+    {
         h /= 3;
-        
+
         // Para cada elemento a partir da posição h+1
-        for (int j = h + 1; j <= tam; j++) {
+        for (int j = h + 1; j <= tam; j++)
+        {
             // Lê o registro j (elemento a ser inserido)
             fseek(arq, (j - 1) * tamanhoCliente(), SEEK_SET);
             TCliente *fj = leCliente(arq);
-            
+
             int i = j - h;
-            
+
             // Lê o registro i (para comparação)
             fseek(arq, (i - 1) * tamanhoCliente(), SEEK_SET);
             TCliente *fi = leCliente(arq);
 
             // Move elementos maiores que fj para a direita (com intervalo h)
-            while (i > 0 && fi->cod > fj->cod) {
+            while (i > 0 && fi->cod > fj->cod)
+            {
                 // Move fi para a posição i + h
                 fseek(arq, (i + h - 1) * tamanhoCliente(), SEEK_SET);
                 salvaCliente(fi, arq);
-                
+
                 // Próxima posição a verificar
                 i -= h;
-                
+
                 // Se ainda há elementos para verificar, lê o próximo
-                if (i > 0) {
+                if (i > 0)
+                {
                     free(fi); // Libera a memória do registro anterior
                     fseek(arq, (i - 1) * tamanhoCliente(), SEEK_SET);
                     fi = leCliente(arq);
                 }
             }
-            
+
             // Posiciona no local correto para salvar o registro j
             fseek(arq, (i + h - 1) * tamanhoCliente(), SEEK_SET);
             salvaCliente(fj, arq);
-            
+
             // Libera memória
             free(fj);
-            if (i > 0) free(fi);
+            if (i > 0)
+                free(fi);
         }
     } while (h > 1);
-    
+
     // Descarrega o buffer para garantir que os dados sejam salvos
     fflush(arq);
 }
@@ -259,7 +287,6 @@ void ShellsortCliente(FILE *arq, int tam) {
 //                         Funções TCamisa                                    //
 //                                                                            //
 /*//////////////////////////////////////////////////////////////////////////////*/
-
 
 TCamisa *camisa(int cod, int tipo, char *ano, char *time)
 {
@@ -460,12 +487,14 @@ void ImprimirBaseCamisa(FILE *out)
     free(ka);
 }
 
-void embaralhaCamisa(int *vet, int tam) {
+void embaralhaCamisa(int *vet, int tam)
+{
     int tmp;
     srand(time(NULL));
-    int trocas = (tam*60)/100;
+    int trocas = (tam * 60) / 100;
 
-    for(int t = 1; t < trocas; t++){
+    for (int t = 1; t < trocas; t++)
+    {
         int i = rand() % tam;
         int j = rand() % tam;
         tmp = vet[i];
@@ -475,57 +504,64 @@ void embaralhaCamisa(int *vet, int tam) {
 }
 
 // Shell Sort para TCamisa
-void ShellsortCamisa(FILE *arq, int tam) {
+void ShellsortCamisa(FILE *arq, int tam)
+{
     int h = 1;
-    
+
     // Encontrar o maior valor de h possível (sequência de Knuth: h = 3*h + 1)
-    do {
+    do
+    {
         h = h * 3 + 1;
     } while (h < tam);
 
     // Realiza a ordenação com a técnica de Shell Sort
-    do {
+    do
+    {
         h /= 3;
-        
+
         // Para cada elemento a partir da posição h+1
-        for (int j = h + 1; j <= tam; j++) {
+        for (int j = h + 1; j <= tam; j++)
+        {
             // Lê o registro j (elemento a ser inserido)
             fseek(arq, (j - 1) * tamanhoCamisa(), SEEK_SET);
             TCamisa *fj = leCamisa(arq);
-            
+
             int i = j - h;
-            
+
             // Lê o registro i (para comparação)
             fseek(arq, (i - 1) * tamanhoCamisa(), SEEK_SET);
             TCamisa *fi = leCamisa(arq);
 
             // Move elementos maiores que fj para a direita (com intervalo h)
-            while (i > 0 && fi->cod > fj->cod) {
+            while (i > 0 && fi->cod > fj->cod)
+            {
                 // Move fi para a posição i + h
                 fseek(arq, (i + h - 1) * tamanhoCamisa(), SEEK_SET);
                 salvaCamisa(fi, arq);
-                
+
                 // Próxima posição a verificar
                 i -= h;
-                
+
                 // Se ainda há elementos para verificar, lê o próximo
-                if (i > 0) {
+                if (i > 0)
+                {
                     free(fi); // Libera a memória do registro anterior
                     fseek(arq, (i - 1) * tamanhoCamisa(), SEEK_SET);
                     fi = leCamisa(arq);
                 }
             }
-            
+
             // Posiciona no local correto para salvar o registro j
             fseek(arq, (i + h - 1) * tamanhoCamisa(), SEEK_SET);
             salvaCamisa(fj, arq);
-            
+
             // Libera memória
             free(fj);
-            if (i > 0) free(fi);
+            if (i > 0)
+                free(fi);
         }
     } while (h > 1);
-    
+
     // Descarrega o buffer para garantir que os dados sejam salvos
     fflush(arq);
 }
@@ -545,8 +581,8 @@ TPedido *pedido(int cod, TCliente *cliente, TCamisa *camisa)
 
     // Copia os valores para os campos de pedido
     pedido->cod = cod;
-    pedido->cliente = *cliente;  // Copiar os dados do cliente
-    pedido->camisa = *camisa;    // Copiar os dados da camisa
+    pedido->cliente = *cliente; // Copiar os dados do cliente
+    pedido->camisa = *camisa;   // Copiar os dados da camisa
 
     return pedido;
 }
@@ -580,7 +616,7 @@ TPedido *lePedido(FILE *in)
     fread(&pedido->cliente.cod, sizeof(int), 1, in);
     fread(pedido->cliente.nome, sizeof(char), sizeof(pedido->cliente.nome), in);
     fread(&pedido->cliente.cpf, sizeof(int), 1, in);
-    
+
     // Ler dados da camisa
     fread(&pedido->camisa.cod, sizeof(int), 1, in);
     fread(&pedido->camisa.tipo, sizeof(int), 1, in);
@@ -595,7 +631,7 @@ void imprimePedido(TPedido *pedido)
 {
     printf("**********************************************\n");
     printf("Pedido de código %d\n", pedido->cod);
-    
+
     // Imprimir dados do cliente
     printf("Cliente: %d\n", pedido->cliente.cod);
     printf("Nome: %s\n", pedido->cliente.nome);
@@ -613,13 +649,14 @@ void imprimePedido(TPedido *pedido)
 // Retorna tamanho do pedido em bytes
 int tamanhoPedido()
 {
-    return sizeof(int)           // cod
-           + sizeof(TCliente)    // cliente
-           + sizeof(TCamisa);    // camisa
+    return sizeof(int)        // cod
+           + sizeof(TCliente) // cliente
+           + sizeof(TCamisa); // camisa
 }
 
 // Retorna a quantidade de registros no arquivo
-int tamanho_arquivo_Pedido(FILE *arq) {
+int tamanho_arquivo_Pedido(FILE *arq)
+{
     fseek(arq, 0, SEEK_END);
     int tam = trunc(ftell(arq) / tamanhoPedido());
     return tam;
@@ -670,50 +707,68 @@ TPedido *buscaSequencialPedido(int chave, FILE *in, FILE *log)
 }
 
 // Busca binária de um pedido no arquivo
-TPedido *busca_binariaPedido(int chave, FILE *in, int inicio, int fim, FILE *log)
+TPedido *buscaBinariaPedido(FILE *out, int codigo, FILE *log)
 {
-    TPedido *pedido = NULL;
-    int cod = -1;
-    int cont = 0;
-    clock_t inicioT, fimT;
-    double total;
+    int comparacoes = 0;
+    double tempoExecucao;
+    int inicio = 0;
 
-    inicioT = clock();
+    // Obtém o final do arquivo
+    fseek(out, 0, SEEK_END);
+    int fim = ftell(out) / tamanhoPedido() - 1;
 
-    while (inicio <= fim && cod != chave)
+    // Inicia o cronômetro
+    clock_t temporizadorInicio = clock();
+
+    while (inicio <= fim)
     {
-        int meio = trunc((inicio + fim) / 2);
-        fseek(in, (meio - 1) * tamanhoPedido(), SEEK_SET);
-        pedido = lePedido(in);
-        cod = pedido->cod;
+        int meio = (inicio + fim) / 2;
+        comparacoes++;
 
-        cont++;
+        // Posiciona no meio do arquivo
+        fseek(out, meio * tamanhoPedido(), SEEK_SET);
+        TPedido *p = lePedido(out);  // Leitura do pedido conforme sua estrutura
 
-        if (pedido)
+        if (p == NULL)
         {
-            if (cod > chave)
-            {
-                fim = meio - 1;
-            }
-            else
-            {
-                inicio = meio + 1;
-            }
+            break; // Sai do loop caso não consiga ler o pedido
         }
+
+        // Se encontrou o pedido, retorna
+        if (p->cod == codigo)
+        {
+            clock_t temporizadorFinal = clock();
+            tempoExecucao = ((double)(temporizadorFinal - temporizadorInicio)) / CLOCKS_PER_SEC;
+
+            // Salva comparações e tempo no log
+            fprintf(log, "\nComparacoes Binarias: %d ", comparacoes);
+            fprintf(log, "\nTempo Binario: %f ", tempoExecucao);
+
+            free(p);
+            return p;
+        }
+        // Se o código for maior, move para a metade direita
+        else if (p->cod < codigo)
+        {
+            inicio = meio + 1;
+        }
+        // Se o código for menor, move para a metade esquerda
+        else
+        {
+            fim = meio - 1;
+        }
+
+        free(p);
     }
 
-    if (cod == chave)
-    {
-        fprintf(log, "\nComparacoes Binarias: %d ", cont);
-        fimT = clock();
-        total = (fimT - inicioT) / CLOCKS_PER_SEC;
-        fprintf(log, "\nTempo Binario: %f ", total);
-        return pedido;
-    }
-    else
-    {
-        return NULL;
-    }
+    clock_t temporizadorFinal = clock();
+    tempoExecucao = ((double)(temporizadorFinal - temporizadorInicio)) / CLOCKS_PER_SEC;
+
+    // Salva comparações e tempo no log
+    fprintf(log, "\nComparacoes Binarias: %d ", comparacoes);
+    fprintf(log, "\nTempo Binario: %f ", tempoExecucao);
+
+    return NULL; // Retorna NULL caso não encontre o pedido
 }
 
 // Imprime a base de dados de pedidos
@@ -730,12 +785,14 @@ void ImprimirBasePedido(FILE *out)
     }
 }
 
-void embaralhaPedido(int *vet, int tam) {
+void embaralhaPedido(int *vet, int tam)
+{
     int tmp;
     srand(time(NULL));
-    int trocas = (tam*60)/100;
+    int trocas = (tam * 60) / 100;
 
-    for(int t = 1; t < trocas; t++){
+    for (int t = 1; t < trocas; t++)
+    {
         int i = rand() % tam;
         int j = rand() % tam;
         tmp = vet[i];
@@ -745,57 +802,64 @@ void embaralhaPedido(int *vet, int tam) {
 }
 
 // Shell Sort para TPedido
-void ShellsortPedido(FILE *arq, int tam) {
+void ShellsortPedido(FILE *arq, int tam)
+{
     int h = 1;
-    
+
     // Encontrar o maior valor de h possível (sequência de Knuth: h = 3*h + 1)
-    do {
+    do
+    {
         h = h * 3 + 1;
     } while (h < tam);
 
     // Realiza a ordenação com a técnica de Shell Sort
-    do {
+    do
+    {
         h /= 3;
-        
+
         // Para cada elemento a partir da posição h+1
-        for (int j = h + 1; j <= tam; j++) {
+        for (int j = h + 1; j <= tam; j++)
+        {
             // Lê o registro j (elemento a ser inserido)
             fseek(arq, (j - 1) * tamanhoPedido(), SEEK_SET);
             TPedido *fj = lePedido(arq);
-            
+
             int i = j - h;
-            
+
             // Lê o registro i (para comparação)
             fseek(arq, (i - 1) * tamanhoPedido(), SEEK_SET);
             TPedido *fi = lePedido(arq);
 
             // Move elementos maiores que fj para a direita (com intervalo h)
-            while (i > 0 && fi->cod > fj->cod) {
+            while (i > 0 && fi->cod > fj->cod)
+            {
                 // Move fi para a posição i + h
                 fseek(arq, (i + h - 1) * tamanhoPedido(), SEEK_SET);
                 salvaPedido(fi, arq);
-                
+
                 // Próxima posição a verificar
                 i -= h;
-                
+
                 // Se ainda há elementos para verificar, lê o próximo
-                if (i > 0) {
+                if (i > 0)
+                {
                     free(fi); // Libera a memória do registro anterior
                     fseek(arq, (i - 1) * tamanhoPedido(), SEEK_SET);
                     fi = lePedido(arq);
                 }
             }
-            
+
             // Posiciona no local correto para salvar o registro j
             fseek(arq, (i + h - 1) * tamanhoPedido(), SEEK_SET);
             salvaPedido(fj, arq);
-            
+
             // Libera memória
             free(fj);
-            if (i > 0) free(fi);
+            if (i > 0)
+                free(fi);
         }
     } while (h > 1);
-    
+
     // Descarrega o buffer para garantir que os dados sejam salvos
     fflush(arq);
 }

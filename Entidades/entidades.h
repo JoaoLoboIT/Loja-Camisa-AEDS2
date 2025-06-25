@@ -117,7 +117,7 @@ int tamanho_arquivo_Pedido(FILE *arq);
 TPedido *buscaSequencialPedido(int chave, FILE *in, FILE *log);
 
 // Busca binária de um pedido no arquivo
-TPedido *busca_binariaPedido(int chave, FILE *in, int inicio, int fim, FILE *log);
+TPedido *buscaBinariaPedido(FILE *out, int codigo, FILE *log);
 
 // Imprime a base de dados de pedidos
 void ImprimirBasePedido(FILE *out);

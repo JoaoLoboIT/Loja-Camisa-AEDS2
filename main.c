@@ -13,11 +13,9 @@ void menu()
     printf("8 - Criar Camisa\n");
     printf("9 - Criar Pedido\n");
     printf("10 - Imprimir bases de pedidos\n");
-    printf("11 - Fazer busca sequencial pedido\n");
-    printf("12 - Fazer busca binaria pedido\n");
-    printf("13 - Ordenar base cliente\n");
-    printf("14 - Ordenar base camisa\n");
-    printf("15 - ordenar base pedido\n");
+    printf("11 - Ordenar base cliente\n");
+    printf("12 - Ordenar base camisa\n");
+    printf("13 - Ordenar base pedido\n");
     printf("0 - Sair\n");
     printf("Digite a opção desejada: ");
 }
@@ -175,7 +173,7 @@ int main()
             nome[strcspn(nome, "\n")] = '\0';
 
             printf("Digite o CPF do cliente: ");
-            scanf("%d", cpf);
+            scanf("%d", &cpf);
 
             TCliente *cNovo = cliente(cod1, nome, cpf);
             salvaCliente(cNovo, arqClientes);
@@ -272,47 +270,8 @@ int main()
             ImprimirBasePedido(arqPedidos);
             break;
         }
+        
         case 11:
-        {
-            TPedido *p1;
-            int codBusca;
-
-            printf("Digite o código do pedido para buscar (sequencial): ");
-            scanf("%d", &codBusca);
-
-            p1 = buscaSequencialPedido(codBusca, arqPedidos, log);
-            if (p1 != NULL)
-            {
-                imprimePedido(p1);
-                free(p1);
-            }
-            else
-            {
-                printf("\nPedido não encontrado!\n");
-            }
-            break;
-        }
-        case 12:
-        {
-            TPedido *p2;
-            int codBusca;
-
-            printf("Digite o código do pedido para buscar (binária): ");
-            scanf("%d", &codBusca);
-
-            p2 = busca_binariaPedido(codBusca, arqPedidos, 0, tamanho_arquivo_Pedido(arqPedidos) - 1, log);
-            if (p2 != NULL)
-            {
-                imprimePedido(p2);
-                free(p2);
-            }
-            else
-            {
-                printf("\nPedido não encontrado!\n");
-            }
-            break;
-        }
-        case 13:
         {
 
             int tamanho_base_clientes = tamanho_arquivo_Cliente(arqClientes);
@@ -320,14 +279,14 @@ int main()
             printf("\nBase de clientes ordenada com sucesso!\n");
             break;
         }
-        case 14:
+        case 12:
         {
             int tamanho_base_camisas = tamanho_arquivo_Camisa(arqCamisas);
             ShellsortCamisa(arqCamisas, tamanho_base_camisas);
             printf("\nBase de camisas ordenada com sucesso!\n");
             break;
         }
-        case 15:
+        case 13:
         {
             int tamanho_base_pedidos = tamanho_arquivo_Pedido(arqPedidos);
             ShellsortPedido(arqPedidos, tamanho_base_pedidos);
