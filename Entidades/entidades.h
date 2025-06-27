@@ -113,12 +113,6 @@ int tamanhoPedido();
 // Retorna a quantidade de registros no arquivo
 int tamanho_arquivo_Pedido(FILE *arq);
 
-// Busca sequencial de um pedido no arquivo
-TPedido *buscaSequencialPedido(int chave, FILE *in, FILE *log);
-
-// Busca binária de um pedido no arquivo
-TPedido *buscaBinariaPedido(FILE *out, int codigo, FILE *log);
-
 // Imprime a base de dados de pedidos
 void ImprimirBasePedido(FILE *out);
 
