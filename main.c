@@ -212,57 +212,21 @@ int main()
         }
         case 9:
         {
-            // Criar Cliente
-            int codCliente, cpf;
-            char nomeCliente[50];
-
-            printf("Digite o código do cliente: ");
-            scanf("%d", &codCliente);
-            getchar();
-            printf("Digite o nome do cliente: ");
-            fgets(nomeCliente, sizeof(nomeCliente), stdin);
-            nomeCliente[strcspn(nomeCliente, "\n")] = '\0';
-            printf("Digite o CPF do cliente: ");
-            scanf("%d", &cpf);
-
-            TCliente *novoCliente = cliente(codCliente, nomeCliente, cpf);
-            salvaCliente(novoCliente, arqClientes);
-
-            // Criar Camisa
-            int codCamisa, tipoCamisa;
-            char anoCamisa[20], timeCamisa[20];
-
-            printf("Digite o código da camisa: ");
-            scanf("%d", &codCamisa);
-            printf("Digite o tipo da camisa: ");
-            scanf("%d", &tipoCamisa);
-            getchar();
-            printf("Digite o ano da camisa: ");
-            fgets(anoCamisa, sizeof(anoCamisa), stdin);
-            anoCamisa[strcspn(anoCamisa, "\n")] = '\0';
-            printf("Digite o time da camisa: ");
-            fgets(timeCamisa, sizeof(timeCamisa), stdin);
-            timeCamisa[strcspn(timeCamisa, "\n")] = '\0';
-
-            TCamisa *novaCamisa = camisa(codCamisa, tipoCamisa, anoCamisa, timeCamisa);
-            salvaCamisa(novaCamisa, arqCamisas);
-
-            // Criar Pedido
             int codPedido;
             printf("Digite o código do pedido: ");
             scanf("%d", &codPedido);
 
-            TPedido *novoPedido = pedido(codPedido, novoCliente, novaCamisa);
-            salvaPedido(novoPedido, arqPedidos);
+            // Criar Pedido com base nos IDs de cliente e camisa usando busca sequencial
+            TPedido *novoPedido = pedido(codPedido, arqClientes, arqCamisas, log);
+            if (novoPedido)
+            {
+                salvaPedido(novoPedido, arqPedidos);
+                printf("\nPedido criado com sucesso!\n");
+                imprimePedido(novoPedido);
 
-            printf("\nPedido criado com sucesso!\n");
-            imprimePedido(novoPedido);
-
-            // Libera memória
-            free(novoCliente);
-            free(novaCamisa);
-            free(novoPedido);
-
+                // Libera memória
+                free(novoPedido);
+            }
             break;
         }
         case 10:
@@ -270,7 +234,7 @@ int main()
             ImprimirBasePedido(arqPedidos);
             break;
         }
-        
+
         case 11:
         {
 

@@ -573,18 +573,49 @@ void ShellsortCamisa(FILE *arq, int tam)
 /*//////////////////////////////////////////////////////////////////////////////*/
 
 // Cria um pedido. Lembrar de usar free(pedido)
-TPedido *pedido(int cod, TCliente *cliente, TCamisa *camisa)
+// Função para criar Pedido com base em Cliente e Camisa encontrados via busca sequencial
+TPedido *pedido(int cod, FILE *arqClientes, FILE *arqCamisas, FILE *log)
 {
-    TPedido *pedido = (TPedido *)malloc(sizeof(TPedido));
-    if (pedido)
-        memset(pedido, 0, sizeof(TPedido));
+    int codCliente, codCamisa;
 
-    // Copia os valores para os campos de pedido
-    pedido->cod = cod;
-    pedido->cliente = *cliente; // Copiar os dados do cliente
-    pedido->camisa = *camisa;   // Copiar os dados da camisa
+    // Solicitar os códigos do cliente e da camisa
+    printf("Digite o código do cliente: ");
+    scanf("%d", &codCliente);
 
-    return pedido;
+    // Realizar busca sequencial para cliente
+    TCliente *cliente = buscaSequencialCliente(codCliente, arqClientes, log);
+    if (cliente == NULL)
+    {
+        printf("\nCliente não encontrado!\n");
+        return NULL;
+    }
+
+    printf("Digite o código da camisa: ");
+    scanf("%d", &codCamisa);
+
+    // Realizar busca sequencial para camisa
+    TCamisa *camisa = buscaSequencialCamisa(codCamisa, arqCamisas, log);
+    if (camisa == NULL)
+    {
+        printf("\nCamisa não encontrada!\n");
+        free(cliente);
+        return NULL;
+    }
+
+    // Criar pedido
+    TPedido *novoPedido = (TPedido *)malloc(sizeof(TPedido));
+    if (novoPedido)
+    {
+        novoPedido->cod = cod;
+        novoPedido->cliente = *cliente;
+        novoPedido->camisa = *camisa;
+    }
+
+    // Libera memória dos objetos cliente e camisa
+    free(cliente);
+    free(camisa);
+
+    return novoPedido;
 }
 
 // Salva pedido no arquivo out, na posição atual do cursor
@@ -661,7 +692,6 @@ int tamanho_arquivo_Pedido(FILE *arq)
     int tam = trunc(ftell(arq) / tamanhoPedido());
     return tam;
 }
-
 
 // Imprime a base de dados de pedidos
 void ImprimirBasePedido(FILE *out)

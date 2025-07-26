@@ -96,7 +96,7 @@ void ShellsortCliente(FILE *arq, int tam);
 /*//////////////////////////////////////////////////////////////////////////////*/
 
 // Cria um pedido. Lembrar de usar free(pedido)
-TPedido *pedido(int cod, TCliente *cliente, TCamisa *camisa);
+TPedido *pedido(int cod, FILE *arqClientes, FILE *arqCamisas, FILE *log);
 
 // Salva pedido no arquivo out, na posição atual do cursor
 void salvaPedido(TPedido *pedido, FILE *out);
