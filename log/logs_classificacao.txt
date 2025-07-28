@@ -1,0 +1,5 @@
+*****************************************
+Selecao Natural - TCliente:
+Numero de particoes criadas: 1472
+Tempo de execucao: 2.92 segundos
+

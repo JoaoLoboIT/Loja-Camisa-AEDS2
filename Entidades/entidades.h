@@ -5,8 +5,10 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <time.h>
+#include <limits.h> 
 #include <math.h>
 #include <stdio.h>
+#include <unistd.h>
 
 typedef struct Cliente {
     int cod;
@@ -88,6 +90,9 @@ void ImprimirBaseCliente(FILE *out);
 void embaralhaCliente(int *vet, int tam);
 
 void ShellsortCliente(FILE *arq, int tam);
+
+int selecao_natural_TCliente(FILE *arq, int M);
+void intercalacao_otima_TCliente(int F, int total_particoes, FILE *arq_principal);
 
 /*//////////////////////////////////////////////////////////////////////////////*/
 //                                                                            //

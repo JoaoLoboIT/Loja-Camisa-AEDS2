@@ -16,6 +16,7 @@ void menu()
     printf("11 - Ordenar base cliente\n");
     printf("12 - Ordenar base camisa\n");
     printf("13 - Ordenar base pedido\n");
+    printf("14 - Ordenar Base Clientes (Selecao Natural + Intercalacao Otima)\n");
     printf("0 - Sair\n");
     printf("Digite a opção desejada: ");
 }
@@ -61,6 +62,9 @@ int main()
     criarBaseCamisa(arqCamisas, TAMANHO_BASE);
     criarBaseCliente(arqClientes, TAMANHO_BASE);
 
+    // Defina o tamanho da memória para a Seleção Natural
+    int M = 6; // Memória para Seleção Natural
+    int F = 5; // Vias (arquivos) para Intercalação Ótima
     int opcao;
     do
     {
@@ -257,7 +261,31 @@ int main()
             printf("Base de pedidos ordenada com sucesso!\n");
             break;
         }
+        case 14:
+        {
+            printf("\n-- INICIANDO ORDENACAO EXTERNA COMPLETA --\n");
 
+            // ETAPA 1: Gerar partições ordenadas
+            printf("Etapa 1: Gerando particoes com Selecao Natural...\n");
+            int num_particoes = selecao_natural_TCliente(arqClientes, M);
+
+            if (num_particoes >= 0)
+            {
+                printf(" > Foram geradas %d particoes.\n", num_particoes);
+
+                // ETAPA 2: Intercalar as partições
+                printf("Etapa 2: Intercalando particoes com Intercalacao Otima...\n");
+                intercalacao_otima_TCliente(F, num_particoes, arqClientes);
+                printf(" > Intercalacao concluida! O arquivo 'cliente.dat' foi ordenado.\n");
+            }
+            else
+            {
+                printf("\nOcorreu um erro durante a Selecao Natural.\n");
+            }
+
+            printf("-- ORDENACAO EXTERNA FINALIZADA --\n");
+            break;
+        }
         case 0:
             printf("Saindo...\n");
             break;
@@ -265,7 +293,6 @@ int main()
         default:
             printf("Opção inválida! Tente novamente.\n");
         }
-
     } while (opcao != 0);
 
     // Fechar arquivos

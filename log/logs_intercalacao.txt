@@ -1,0 +1,5 @@
+*****************************************
+Intercalacao Otima - TCliente: 
+Numero de passadas de intercalacao: 368
+Tempo de execucao: 0.78 segundos
+

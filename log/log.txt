@@ -1,5 +1,3 @@
 
-Comparacoes Sequencial: 3 
-Tempo Sequencial: 0.000000 
-Comparacoes Sequencial: 5 
+Comparacoes Sequencial: 31 
 Tempo Sequencial: 0.000000 
