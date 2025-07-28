@@ -504,7 +504,7 @@ void salvar_informacoes_logs_intercalacao(const char *descricao, int passadas, d
         printf("Erro ao abrir o ficheiro de logs.\n");
         return;
     }
-    fprintf(logs, "*****************************************\n%s: \nNumero de passadas de intercalacao: %d\nTempo de execucao: %.2f segundos\n\n", descricao, passadas, tempo);
+    fprintf(logs, "*****************************************\n%s: \nNumero de comparações: %d\nTempo de execucao: %.2f segundos\n\n", descricao, passadas, tempo);
     fclose(logs);
 }
 

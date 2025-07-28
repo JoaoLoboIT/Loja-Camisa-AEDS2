@@ -1,20 +1,15 @@
 *****************************************
 Selecao Natural - TCliente:
 Numero de particoes criadas: 78
-Tempo de execucao: 0.43 segundos
+Tempo de execucao: 0.27 segundos
 
 *****************************************
 Selecao Natural - TCliente:
-Numero de particoes criadas: 1471
-Tempo de execucao: 9.48 segundos
+Numero de particoes criadas: 1477
+Tempo de execucao: 7.77 segundos
 
 *****************************************
 Selecao Natural - TCliente:
-Numero de particoes criadas: 2662
-Tempo de execucao: 5.35 segundos
-
-*****************************************
-Selecao Natural - TCliente:
-Numero de particoes criadas: 2669
-Tempo de execucao: 7.23 segundos
+Numero de particoes criadas: 2658
+Tempo de execucao: 10.44 segundos
 

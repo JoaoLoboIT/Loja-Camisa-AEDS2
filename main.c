@@ -261,7 +261,7 @@ int main()
             printf("Base de pedidos ordenada com sucesso!\n");
             break;
         }
-        case 14:
+        case 14:     
         {
             printf("\n-- INICIANDO ORDENACAO EXTERNA COMPLETA --\n");
 
