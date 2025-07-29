@@ -91,6 +91,7 @@ void embaralhaCliente(int *vet, int tam);
 
 void ShellsortCliente(FILE *arq, int tam);
 
+void imprimir_conteudo_particao(const char* nome_arquivo, const char* titulo);
 int selecao_natural_TCliente(FILE *arq, int M);
 void intercalacao_otima_TCliente(int F, int total_particoes, FILE *arq_principal);
 

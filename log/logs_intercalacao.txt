@@ -1,15 +1,15 @@
 *****************************************
 Intercalacao Otima - TCliente: 
 Numero de comparações: 20
-Tempo de execucao: 0.12 segundos
+Tempo de execucao: 0.76 segundos
 
 *****************************************
 Intercalacao Otima - TCliente: 
-Numero de comparações: 369
-Tempo de execucao: 1.36 segundos
+Numero de comparações: 94
+Tempo de execucao: 3.71 segundos
 
 *****************************************
 Intercalacao Otima - TCliente: 
-Numero de comparações: 665
-Tempo de execucao: 1.97 segundos
+Numero de comparações: 190
+Tempo de execucao: 7.57 segundos
 
