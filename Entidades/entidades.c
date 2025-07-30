@@ -285,8 +285,28 @@ void embaralhaCliente(int *vet, int tam)
     }
 }
 
+void salvar_log_shellsort(const char *descricao, long long int comparacoes, double tempo)
+{
+    FILE *logs = fopen("log/log_shellsort.txt", "a"); // Salva em um arquivo separado
+    if (logs == NULL)
+    {
+        printf("Erro ao abrir o ficheiro de logs do Shell Sort.\n");
+        return;
+    }
+    fprintf(logs, "*****************************************\n");
+    fprintf(logs, "%s:\n", descricao);
+    fprintf(logs, "Numero de comparacoes: %lld\n", comparacoes);
+    fprintf(logs, "Tempo de execucao: %.4f segundos\n\n", tempo);
+    fclose(logs);
+}
+
 void ShellsortCliente(FILE *arq, int tam)
 {
+    long long int comparacoes = 0;
+    clock_t inicio, fim;
+    double tempo_execucao;
+
+    inicio = clock(); // Inicia o cronômetro
     int h = 1;
 
     // Encontrar o maior valor de h possível (sequência de Knuth: h = 3*h + 1)
@@ -313,6 +333,11 @@ void ShellsortCliente(FILE *arq, int tam)
             fseek(arq, (i - 1) * tamanhoCliente(), SEEK_SET);
             TCliente *fi = leCliente(arq);
 
+            if (fi != NULL)
+            { // Garante que não estamos comparando um ponteiro nulo
+                comparacoes++;
+            }
+
             // Move elementos maiores que fj para a direita (com intervalo h)
             while (i > 0 && fi->cod > fj->cod)
             {
@@ -329,6 +354,10 @@ void ShellsortCliente(FILE *arq, int tam)
                     free(fi); // Libera a memória do registro anterior
                     fseek(arq, (i - 1) * tamanhoCliente(), SEEK_SET);
                     fi = leCliente(arq);
+                    if (fi != NULL)
+                    {
+                        comparacoes++;
+                    }
                 }
             }
 
@@ -345,6 +374,11 @@ void ShellsortCliente(FILE *arq, int tam)
 
     // Descarrega o buffer para garantir que os dados sejam salvos
     fflush(arq);
+    fim = clock();
+    tempo_execucao = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+    salvar_log_shellsort("Shellsort - TCliente (Sua Versao)", comparacoes, tempo_execucao);
+
+    printf("\nShell Sort concluido! Resultados salvos em 'log/log_shellsort.txt'\n");
 }
 
 // Função AUXILIAR de SELEÇÃO NATURAL para verificar se o array em memória está vazio

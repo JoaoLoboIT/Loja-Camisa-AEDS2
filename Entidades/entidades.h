@@ -89,6 +89,7 @@ void criarBaseCliente(FILE *out, int tam);
 void ImprimirBaseCliente(FILE *out);
 void embaralhaCliente(int *vet, int tam);
 
+void salvar_log_shellsort(const char *descricao, long long int comparacoes, double tempo);
 void ShellsortCliente(FILE *arq, int tam);
 
 void imprimir_conteudo_particao(const char* nome_arquivo, const char* titulo);
