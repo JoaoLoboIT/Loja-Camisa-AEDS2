@@ -673,7 +673,6 @@ void intercalacao_otima_TCliente(int F, int total_particoes, FILE *arq_principal
             }
         }
 
-        // Cria a nova partição de saída para esta passada
         sprintf(nomeParticao, "dat/particao_cliente_%d.dat", particao_atual_id);
         FILE *saida = fopen(nomeParticao, "w+b");
 
@@ -724,7 +723,6 @@ void intercalacao_otima_TCliente(int F, int total_particoes, FILE *arq_principal
         particao_atual_id++;
     }
 
-    // 4. Finalização: Copia a última partição (que é o arquivo completo e ordenado) para o arquivo original
     TStruct p_final;
     Desenfileirar(&fila, &p_final);
     FILE *arq_final_ordenado = fopen(p_final.particao, "rb");

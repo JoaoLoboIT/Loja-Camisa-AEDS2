@@ -1,15 +1,20 @@
 *****************************************
 Shellsort - TCliente (Sua Versao):
-Numero de comparacoes: 14413
-Tempo de execucao: 0.0670 segundos
+Numero de comparacoes: 747
+Tempo de execucao: 0.0070 segundos
 
 *****************************************
 Shellsort - TCliente (Sua Versao):
-Numero de comparacoes: 101264
-Tempo de execucao: 0.4590 segundos
+Numero de comparacoes: 13509
+Tempo de execucao: 0.0610 segundos
 
 *****************************************
 Shellsort - TCliente (Sua Versao):
-Numero de comparacoes: 1238023
-Tempo de execucao: 5.4090 segundos
+Numero de comparacoes: 235995
+Tempo de execucao: 0.9120 segundos
+
+*****************************************
+Shellsort - TCliente (Sua Versao):
+Numero de comparacoes: 675
+Tempo de execucao: 0.0040 segundos
 

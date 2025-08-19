@@ -1,0 +1,2 @@
+O método de ordenação externa (Seleção Natural + Intercalação Ótima) provou ser muito mais eficiente para bases de dados grandes, pois sua estratégia de criar e juntar partições sequenciais minimiza os lentos acessos aleatórios ao disco. Em contraste, o Shellsort torna-se inviável com o aumento do arquivo, pois realiza um número excessivo de operações de busca (fseek) que degradam a performance.
+

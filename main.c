@@ -17,6 +17,7 @@ void menu()
     printf("12 - Ordenar base camisa\n");
     printf("13 - Ordenar base pedido\n");
     printf("14 - Ordenar Base Clientes (Selecao Natural + Intercalacao Otima)\n");
+    printf("15 - Embaralhar Base de Clientes\n");
     printf("0 - Sair\n");
     printf("Digite a opção desejada: ");
 }
@@ -261,7 +262,7 @@ int main()
             printf("Base de pedidos ordenada com sucesso!\n");
             break;
         }
-        case 14:     
+        case 14:
         {
             printf("\n-- INICIANDO ORDENACAO EXTERNA COMPLETA --\n");
 
@@ -284,6 +285,14 @@ int main()
             }
 
             printf("-- ORDENACAO EXTERNA FINALIZADA --\n");
+            break;
+        }
+        case 15:
+        {
+            printf("\nEmbaralhando a base de clientes...\n");
+            // Chama a função existente para recriar e embaralhar a base
+            criarBaseCliente(arqClientes, TAMANHO_BASE);
+            printf("Base de clientes embaralhada com sucesso!\n");
             break;
         }
         case 0:
