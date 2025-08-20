@@ -85,6 +85,8 @@ TCliente *cliente(int cod, char *nome, int cpf)
     cliente->cod = cod;
     strcpy(cliente->nome, nome);
     cliente->cpf = cpf;
+    cliente->prox = -1;     // Valor padrão para o novo campo
+    cliente->ocupado = 1;
     return cliente;
 }
 
@@ -95,6 +97,8 @@ void salvaCliente(TCliente *cliente, FILE *out)
     // cliente->nome ao invés de &cliente->nome, pois string já é ponteiro
     fwrite(cliente->nome, sizeof(char), sizeof(cliente->nome), out);
     fwrite(&cliente->cpf, sizeof(int), 1, out);
+    fwrite(&cliente->prox, sizeof(int), 1, out);
+    fwrite(&cliente->ocupado, sizeof(int), 1, out);
 }
 
 // Le um cliente do arquivo in na posicao atual do cursor
@@ -109,6 +113,8 @@ TCliente *leCliente(FILE *in)
     }
     fread(cliente->nome, sizeof(char), sizeof(cliente->nome), in);
     fread(&cliente->cpf, sizeof(int), 1, in);
+    fread(&cliente->prox, sizeof(int), 1, in);
+    fread(&cliente->ocupado, sizeof(int), 1, in);
     return cliente;
 }
 
@@ -122,7 +128,9 @@ void imprimeCliente(TCliente *cliente)
     printf("%s", cliente->nome);
     printf("\nCPF: ");
     printf("%d", cliente->cpf);
-    printf("\n**********************************************");
+    printf("\nStatus: %s\n", cliente->ocupado ? "Ativo" : "Removido");
+    printf("Proximo na lista de colisao: %d\n", cliente->prox);
+    printf("**********************************************\n");
 }
 
 // Retorna tamanho do cliente em bytes
@@ -130,7 +138,9 @@ int tamanhoCliente()
 {
     return sizeof(int)         // cod
            + sizeof(char) * 50 // nome
-           + sizeof(int);      // cpf
+           + sizeof(int)
+           + sizeof(int)
+           + sizeof(int); 
 }
 
 // Retorna a quantidade de registros no arquivo
@@ -736,6 +746,371 @@ void intercalacao_otima_TCliente(int F, int total_particoes, FILE *arq_principal
     double tempoFinal = clock();
     double tempoDeExecucao = (tempoFinal - tempoInicial) / CLOCKS_PER_SEC;
     salvar_informacoes_logs_intercalacao("Intercalacao Otima - TCliente", (particao_atual_id - total_particoes), tempoDeExecucao);
+}
+
+// =======================================================================
+//
+//               CÓDIGO PARA TABELA HASH EXTERNA (COMENTADO)
+//
+// =======================================================================
+
+// A struct TPosicao representa um único "compartimento" ou "entrada" no nosso
+// ficheiro de tabela hash.
+// Ela contém apenas um campo, 'pos', que armazena um número inteiro.
+// Este número é a posição (o índice) do PRIMEIRO registo de uma lista
+// encadeada no ficheiro de dados 'cliente.dat'.
+// Se 'pos' for -1, significa que este compartimento da tabela hash está vazio.
+typedef struct TPosicao {
+    int pos;
+} TPosicao;
+
+// A função hash transforma a chave (código do cliente) num endereço (índice) na tabela.
+// Usamos o "Método da Divisão": resto da divisão do código pelo tamanho da tabela.
+int funcao_hash(int cod) {
+    return cod % TAMANHO_TABELA_HASH;
+}
+
+// OBJETIVO: Preparar o arquivo da tabela hash para uso.
+// A função cria um arquivo novo (ou limpa um existente) e preenche cada
+// uma de suas posições (gavetas) com o valor -1, que significa "vazio".
+void criar_tabela_hash_cliente(FILE *tabela_hash) {
+    // Leva o cursor de leitura/escrita para o byte 0, o início absoluto do arquivo.
+    rewind(tabela_hash);
+    
+    // Apaga todo o conteúdo do arquivo, deixando-o com 0 bytes.
+    // Isso garante que não há "lixo" de uma execução anterior do programa.
+    // fileno() converte o ponteiro de arquivo (FILE*) para um descritor de arquivo (int).
+    ftruncate(fileno(tabela_hash), 0);
+
+    // Declara uma variável inteira e atribui o valor -1.
+    // Este será o valor padrão para indicar uma "gaveta" vazia.
+    int pos_vazia = -1;
+    
+    // Imprime uma mensagem informativa para o usuário.
+    printf("Inicializando tabela hash com %d posicoes...\n", TAMANHO_TABELA_HASH);
+    
+    // Inicia um laço que irá se repetir pelo número total de gavetas da tabela.
+    for (int i = 0; i < TAMANHO_TABELA_HASH; i++) {
+        // Escreve o valor da variável 'pos_vazia' (-1) no arquivo.
+        // A cada repetição do laço, um novo -1 é escrito, preenchendo o arquivo.
+        fwrite(&pos_vazia, sizeof(int), 1, tabela_hash);
+    }
+
+    // Imprime uma mensagem de sucesso para o usuário.
+    printf("Tabela Hash 'hash_clientes.dat' criada e inicializada com sucesso.\n");
+}
+
+
+// OBJETIVO: Conectar um cliente à tabela hash, tratando colisões.
+// Esta função implementa a lógica de "inserir no final da lista". Ela pega a posição
+// de um cliente já salvo no arquivo .dat e o adiciona na lista encadeada correta.
+void inserir_na_lista_hash(FILE *tabela_hash, FILE *arq_clientes, int pos_novo_cliente, int cod_novo_cliente) {
+    // Calcula em qual "gaveta" o novo cliente deve ser inserido.
+    // A função hash usa o resto da divisão para mapear o código a um endereço.
+    int hash_addr = funcao_hash(cod_novo_cliente);
+
+    // Move o cursor no arquivo da tabela hash para a posição (gaveta) calculada.
+    // Multiplicamos o endereço pelo tamanho de um inteiro, pois cada gaveta guarda um int.
+    fseek(tabela_hash, hash_addr * sizeof(int), SEEK_SET);
+    
+    // Declara uma variável para guardar o conteúdo da gaveta.
+    int pos_cabeca_lista;
+    // Lê o valor que está na gaveta. Pode ser -1 (vazia) ou a posição de um cliente.
+    fread(&pos_cabeca_lista, sizeof(int), 1, tabela_hash);
+
+    // Verifica se a gaveta estava vazia.
+    if (pos_cabeca_lista == -1) {
+        // Se estava vazia (sem colisão), a gaveta agora apontará para o nosso novo cliente.
+        // Move o cursor de volta para a mesma gaveta para escrever nela.
+        fseek(tabela_hash, hash_addr * sizeof(int), SEEK_SET);
+        // Escreve a posição do novo cliente na gaveta, tornando-o o primeiro da lista.
+        fwrite(&pos_novo_cliente, sizeof(int), 1, tabela_hash);
+    } else {
+        // Se a gaveta NÃO estava vazia (houve colisão), precisamos encontrar o último cliente da lista.
+        // Começamos a percorrer a lista a partir do primeiro elemento (a cabeça da lista).
+        int pos_atual = pos_cabeca_lista;
+        // Ponteiro temporário para guardar os dados do cliente que estamos percorrendo.
+        TCliente *cliente_percorrido;
+
+        // Inicia um laço infinito que só será quebrado quando encontrarmos o final da lista.
+        while (1) {
+            // Move o cursor no arquivo de DADOS para a posição do cliente que queremos ler.
+            fseek(arq_clientes, pos_atual * tamanhoCliente(), SEEK_SET);
+            // Lê os dados do cliente daquela posição para a memória.
+            cliente_percorrido = leCliente(arq_clientes);
+            
+            // Verifica se este é o último cliente da lista.
+            // O último é aquele cujo campo 'prox' aponta para -1.
+            if (cliente_percorrido->prox == -1) {
+                // Encontramos o fim da lista! O 'prox' deste cliente deve agora apontar para o novo.
+                cliente_percorrido->prox = pos_novo_cliente;
+                
+                // Move o cursor de volta para a posição deste cliente (que era o último).
+                fseek(arq_clientes, pos_atual * tamanhoCliente(), SEEK_SET);
+                // Salva (reescreve) os dados do cliente com o campo 'prox' atualizado.
+                salvaCliente(cliente_percorrido, arq_clientes);
+                
+                // Libera a memória que foi alocada para 'cliente_percorrido'.
+                free(cliente_percorrido);
+                // Quebra o laço 'while', pois a operação de encadeamento terminou.
+                break;
+            }
+            
+            // Se não for o último, prepara a próxima iteração.
+            // A próxima posição a ser verificada é a que está no campo 'prox' do cliente atual.
+            pos_atual = cliente_percorrido->prox;
+            // Libera a memória do cliente atual antes de ler o próximo.
+            free(cliente_percorrido);
+        }
+    }
+}
+
+
+// OBJETIVO: Ler um arquivo de clientes já existente e construir a tabela hash do zero.
+// Esta função é chamada uma única vez no início do programa para inicializar a estrutura.
+void construir_hash_da_base_existente(FILE *tabela_hash, FILE *arq_clientes) {
+    // Imprime uma mensagem informativa para o usuário.
+    printf("\nConstruindo tabela hash a partir da base de dados existente...\n");
+    // Chama a função para criar uma tabela hash limpa, pronta para ser preenchida.
+    criar_tabela_hash_cliente(tabela_hash);
+    // Leva o cursor do arquivo de clientes para o início, para garantir que leremos todos.
+    rewind(arq_clientes);
+
+    // Ponteiro temporário para guardar os dados de cada cliente lido.
+    TCliente *cliente_lido;
+    // Contador para saber a posição (índice 0, 1, 2...) de cada cliente no arquivo.
+    int pos_atual = 0;
+
+    // Laço principal: lê o arquivo de clientes, um por um, até o final.
+    // O laço para quando leCliente() retorna NULL (fim do arquivo).
+    while ((cliente_lido = leCliente(arq_clientes)) != NULL) {
+        
+        // Salva a posição exata do cursor de leitura no arquivo de clientes.
+        // Isto é CRUCIAL para evitar o bug do loop infinito.
+        long int pos_leitura_continua = ftell(arq_clientes);
+
+        // Processa o cliente apenas se ele estiver marcado como "ativo".
+        if (cliente_lido->ocupado == 1) {
+            // Chama a função de inserção para conectar este cliente à tabela hash.
+            // A função 'inserir_na_lista_hash' pode mover o cursor de 'arq_clientes'.
+            inserir_na_lista_hash(tabela_hash, arq_clientes, pos_atual, cliente_lido->cod);
+        }
+
+        // Restaura o cursor de leitura para a posição que salvamos antes da chamada.
+        // Isso garante que a próxima iteração do 'while' continue de onde parou.
+        fseek(arq_clientes, pos_leitura_continua, SEEK_SET);
+
+        // Libera a memória alocada por 'leCliente'.
+        free(cliente_lido);
+        // Incrementa o contador de posição para o próximo cliente.
+        pos_atual++;
+    }
+    // Imprime uma mensagem de sucesso para o usuário.
+    printf("Construção da tabela hash concluída.\n");
+}
+
+
+// OBJETIVO: Permitir que o usuário adicione um cliente completamente novo ao sistema.
+// Esta função lida com a interface (pegar dados) e orquestra a adição ao arquivo e à hash.
+void inserir_novo_cliente_hash(FILE *tabela_hash, FILE *arq_clientes) {
+    // Variáveis para armazenar os dados digitados pelo usuário.
+    int cod, cpf;
+    char nome[50];
+
+    // Interage com o usuário para obter os dados do novo cliente.
+    printf("\n--- Inserir Novo Cliente ---\n");
+    printf("Digite o codigo do cliente: ");
+    scanf("%d", &cod);
+    getchar(); // Consome o '\n' deixado pelo scanf, para que o fgets funcione.
+    printf("Digite o nome do cliente: ");
+    fgets(nome, sizeof(nome), stdin);
+    nome[strcspn(nome, "\n")] = '\0'; // Remove o '\n' que o fgets captura.
+    printf("Digite o CPF do cliente (apenas numeros): ");
+    scanf("%d", &cpf);
+
+    // Usa a função fábrica 'cliente' para criar uma struct TCliente em memória com os dados.
+    // O campo 'prox' é inicializado com -1 automaticamente.
+    TCliente *novo_cliente = cliente(cod, nome, cpf);
+
+    // Move o cursor para o FINAL do arquivo de dados. Novos clientes são sempre adicionados no fim.
+    fseek(arq_clientes, 0, SEEK_END);
+    
+    // Calcula a posição (índice) onde o novo cliente será escrito.
+    // ftell() retorna a posição em bytes; dividimos pelo tamanho do registro para obter o índice.
+    int pos_novo_cliente = ftell(arq_clientes) / tamanhoCliente();
+    
+    // Salva fisicamente o novo cliente no final do arquivo.
+    salvaCliente(novo_cliente, arq_clientes);
+
+    // Chama a função principal de inserção para conectar este novo cliente à tabela hash.
+    inserir_na_lista_hash(tabela_hash, arq_clientes, pos_novo_cliente, novo_cliente->cod);
+
+    // Imprime uma mensagem de sucesso.
+    printf("Cliente de codigo %d inserido com sucesso.\n", novo_cliente->cod);
+    // Libera a memória alocada para a struct.
+    free(novo_cliente);
+}
+
+// OBJETIVO: Encontrar um cliente no arquivo de dados usando a velocidade da tabela hash.
+TCliente* buscar_cliente_hash(int cod, FILE *tabela_hash, FILE *arq_clientes) {
+    // Calcula a "gaveta" onde o cliente DEVERIA estar.
+    int hash_addr = funcao_hash(cod);
+    // Imprime uma mensagem informativa.
+    printf("Buscando codigo %d no endereco de hash %d...\n", cod, hash_addr);
+
+    // Move o cursor na tabela hash para a gaveta correta.
+    fseek(tabela_hash, hash_addr * sizeof(int), SEEK_SET);
+    // Declara uma variável para guardar a posição do primeiro cliente da lista.
+    int pos_atual;
+    // Lê a posição.
+    if (fread(&pos_atual, sizeof(int), 1, tabela_hash) == 0 || pos_atual == -1) {
+        // Se a leitura falhar ou a gaveta estiver vazia (-1), o cliente não pode existir.
+        printf("Nenhum cliente encontrado nesse endereco (compartimento vazio).\n");
+        return NULL; // Retorna NULL para indicar que não encontrou.
+    }
+    
+    // Ponteiro temporário para o cliente que estamos verificando.
+    TCliente* cliente_atual;
+    // Laço para percorrer a lista encadeada, começando pelo primeiro elemento.
+    // O laço continua enquanto a posição atual não for -1 (fim da lista).
+    while (pos_atual != -1) {
+        // Pula para a posição do cliente no arquivo de dados.
+        fseek(arq_clientes, pos_atual * tamanhoCliente(), SEEK_SET);
+        // Lê os dados do cliente.
+        cliente_atual = leCliente(arq_clientes);
+
+        // Verifica se o cliente lido é o que procuramos (mesmo código) E se ele está ativo.
+        if (cliente_atual != NULL && cliente_atual->cod == cod && cliente_atual->ocupado == 1) {
+            // Se as duas condições forem verdadeiras, encontramos o cliente!
+            printf("Cliente encontrado na posicao fisica %d do ficheiro de dados.\n", pos_atual);
+            return cliente_atual; // Retorna o ponteiro para os dados do cliente.
+        }
+        
+        // Se não for o cliente certo, prepara a próxima iteração.
+        // A próxima posição a ser lida é a que está guardada no campo 'prox'.
+        pos_atual = cliente_atual->prox;
+        // Libera a memória do cliente que acabamos de verificar.
+        free(cliente_atual);
+    }
+
+    // Se o laço 'while' terminar, significa que percorremos a lista inteira e não achamos.
+    printf("Cliente com codigo %d nao encontrado na lista de colisao.\n", cod);
+    return NULL; // Retorna NULL.
+}
+
+
+// OBJETIVO: Remover um cliente do sistema.
+// A remoção é "lógica" (o cliente é marcado como inativo) e os ponteiros da
+// lista encadeada são ajustados para "pular" o registro removido.
+void remover_cliente_hash(int cod, FILE *tabela_hash, FILE *arq_clientes) {
+    // Calcula a "gaveta" onde o cliente a ser removido está.
+    int hash_addr = funcao_hash(cod);
+    printf("Procurando cliente %d para remocao no endereco de hash %d...\n", cod, hash_addr);
+
+    // Vai até a gaveta e lê a posição do primeiro cliente da lista.
+    fseek(tabela_hash, hash_addr * sizeof(int), SEEK_SET);
+    int pos_atual;
+    // Se a gaveta estiver vazia, não há o que remover.
+    if (fread(&pos_atual, sizeof(int), 1, tabela_hash) == 0 || pos_atual == -1) {
+        printf("ERRO: Cliente nao encontrado (compartimento vazio).\n");
+        return;
+    }
+    
+    // Variáveis para nos ajudar a percorrer a lista.
+    // Precisamos guardar a posição do cliente ANTERIOR para poder religar os ponteiros.
+    int pos_anterior = -1;
+    TCliente *cliente_atual = NULL;
+
+    // Laço para percorrer a lista e encontrar o cliente.
+    while (pos_atual != -1) {
+        // Pula para a posição e lê os dados do cliente.
+        fseek(arq_clientes, pos_atual * tamanhoCliente(), SEEK_SET);
+        cliente_atual = leCliente(arq_clientes);
+
+        // Verifica se encontramos o cliente certo e se ele está ativo.
+        if (cliente_atual != NULL && cliente_atual->cod == cod && cliente_atual->ocupado == 1) {
+            // ENCONTRAMOS!
+            
+            // ETAPA 1: REMOÇÃO LÓGICA
+            // Marca o campo 'ocupado' como 0. O registro continua no arquivo, mas será ignorado.
+            cliente_atual->ocupado = 0;
+            // Volta para a posição dele e salva a alteração.
+            fseek(arq_clientes, pos_atual * tamanhoCliente(), SEEK_SET);
+            salvaCliente(cliente_atual, arq_clientes);
+            
+            // ETAPA 2: RELIGAR PONTEIROS
+            if (pos_anterior == -1) {
+                // CASO A: O cliente removido era o PRIMEIRO da lista.
+                // A tabela hash precisa ser atualizada para apontar para o próximo da lista.
+                int proxima_pos = cliente_atual->prox; // Pega o endereço do próximo.
+                fseek(tabela_hash, hash_addr * sizeof(int), SEEK_SET);
+                fwrite(&proxima_pos, sizeof(int), 1, tabela_hash); // Escreve o novo endereço na gaveta.
+            } else {
+                // CASO B: O cliente estava no MEIO ou FIM da lista.
+                // O cliente ANTERIOR precisa ser atualizado para "pular" o que foi removido.
+                fseek(arq_clientes, pos_anterior * tamanhoCliente(), SEEK_SET);
+                TCliente *cliente_anterior = leCliente(arq_clientes);
+                // O 'prox' do anterior agora aponta para o 'prox' do cliente atual.
+                cliente_anterior->prox = cliente_atual->prox;
+                // Salva a alteração no cliente anterior.
+                fseek(arq_clientes, pos_anterior * tamanhoCliente(), SEEK_SET);
+                salvaCliente(cliente_anterior, arq_clientes);
+                free(cliente_anterior);
+            }
+            
+            printf("Cliente de codigo %d removido com sucesso.\n", cod);
+            free(cliente_atual);
+            return; // Termina a função, pois o trabalho está feito.
+        }
+
+        // Se não for o cliente certo, avança na lista.
+        pos_anterior = pos_atual; // O atual se torna o anterior na próxima iteração.
+        pos_atual = cliente_atual->prox; // Avança para o próximo.
+        free(cliente_atual);
+    }
+
+    // Se o laço terminar, o cliente não foi encontrado na lista.
+    printf("ERRO: Cliente de codigo %d nao foi encontrado para remocao.\n", cod);
+}
+
+// OBJETIVO: Mostrar o estado atual da tabela hash e de todas as listas.
+// É uma função de "debug" para visualizar a estrutura de dados.
+void imprimir_tabela_hash_completa(FILE *tabela_hash, FILE *arq_clientes) {
+    printf("\n--- IMPRIMINDO TABELA HASH E LISTAS ENCADEADAS ---\n");
+    // Garante que a leitura da tabela hash começará do início.
+    rewind(tabela_hash);
+
+    // Laço que passa por cada uma das gavetas da tabela hash, de 0 a 100.
+    for (int i = 0; i < TAMANHO_TABELA_HASH; i++) {
+        // Lê o conteúdo da gaveta atual (a posição do primeiro cliente da lista).
+        int pos_cabeca_lista;
+        fread(&pos_cabeca_lista, sizeof(int), 1, tabela_hash);
+        // Imprime o número da gaveta.
+        printf("[%03d]: ", i);
+        
+        // Se a gaveta contém -1, ela está vazia.
+        if (pos_cabeca_lista == -1) {
+            printf("-> VAZIO\n");
+        } else {
+            // Se não estiver vazia, percorre e imprime a lista encadeada.
+            int pos_atual = pos_cabeca_lista;
+            while(pos_atual != -1) {
+                fseek(arq_clientes, pos_atual * tamanhoCliente(), SEEK_SET);
+                TCliente* c = leCliente(arq_clientes);
+                if (c != NULL) {
+                    // Imprime apenas se o cliente não foi removido.
+                    if (c->ocupado == 1) {
+                        printf("-> (Pos %d, Cod %d) ", pos_atual, c->cod);
+                    }
+                    // Avança para o próximo da lista.
+                    pos_atual = c->prox;
+                    free(c);
+                } else { break; } // Medida de segurança caso a leitura falhe.
+            }
+            printf("\n"); // Pula uma linha no final de cada lista.
+        }
+    }
+    printf("---------------------------------------------------\n");
 }
 
 /*//////////////////////////////////////////////////////////////////////////////*/

@@ -10,10 +10,14 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#define TAMANHO_TABELA_HASH 101
+
 typedef struct Cliente {
     int cod;
-    int cpf;
     char nome[50];
+    int cpf;
+    int prox;       // Guarda a posição do próximo cliente na lista de colisões (-1 se for o último)
+    int ocupado;    // Flag para remoção lógica (1 = em uso, 0 = removido)
 } TCliente;
 
 typedef struct Camisa {
@@ -126,6 +130,17 @@ void ImprimirBasePedido(FILE *out);
 void embaralhaPedido(int *vet, int tam);
 
 void ShellsortPedido(FILE *arq, int tam);
+
+// =======================================================================
+// NOVAS DECLARAÇÕES PARA A TABELA HASH (Trabalho 3)
+// =======================================================================
+void criar_tabela_hash_cliente(FILE *tabela_hash);
+void construir_hash_da_base_existente(FILE *tabela_hash, FILE *arq_clientes);
+void inserir_cliente_hash(FILE *tabela_hash, FILE *arq_clientes, TCliente *cliente_a_inserir, int pos_novo_cliente);
+void inserir_novo_cliente_hash(FILE *tabela_hash, FILE *arq_clientes);
+TCliente *buscar_cliente_hash(int cod, FILE *tabela_hash, FILE *arq_clientes);
+void remover_cliente_hash(int cod, FILE *tabela_hash, FILE *arq_clientes);
+void imprimir_tabela_hash_completa(FILE *tabela_hash, FILE *arq_clientes);
 
 
 #endif 

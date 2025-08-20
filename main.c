@@ -1,5 +1,17 @@
 #include "Entidades/entidades.c"
 
+void menu_hash()
+{
+    printf("\n--- MENU DE TESTES HASH ---\n");
+    printf("1 - Inserir Novo Cliente\n");
+    printf("2 - Buscar Cliente por Codigo\n");
+    printf("3 - Remover Cliente por Codigo\n");
+    printf("4 - Imprimir Tabela Hash Completa\n");
+    printf("5 - Imprimir Base de Dados de Clientes\n");
+    printf("0 - Voltar ao Menu Principal\n"); // ALTERAÇÃO: Melhor descrição
+    printf("Digite a opção desejada: ");
+}
+
 void menu()
 {
     printf("\nEscolha uma opção:\n");
@@ -18,6 +30,7 @@ void menu()
     printf("13 - Ordenar base pedido\n");
     printf("14 - Ordenar Base Clientes (Selecao Natural + Intercalacao Otima)\n");
     printf("15 - Embaralhar Base de Clientes\n");
+    printf("16 - Menu Hash\n");
     printf("0 - Sair\n");
     printf("Digite a opção desejada: ");
 }
@@ -25,7 +38,7 @@ void menu()
 int main()
 {
 #ifdef _WIN32
-    system("chcp 65001"); // Configura a codificação para UTF-8
+    system("chcp 65001");
 #endif
 
     FILE *arqClientes = fopen("dat/cliente.dat", "r+b");
@@ -47,26 +60,34 @@ int main()
         exit(1);
     }
 
-    if (arqClientes == NULL || arqCamisas == NULL || arqPedidos == NULL)
+    FILE *arq_hash_clientes = fopen("dat/hash_clientes.dat", "r+b");
+    if (arq_hash_clientes == NULL)
     {
-        printf("Erro ao abrir um dos arquivos\n");
+        arq_hash_clientes = fopen("dat/hash_clientes.dat", "w+b");
+    }
+
+    if (arqClientes == NULL || arqCamisas == NULL || arqPedidos == NULL || arq_hash_clientes == NULL)
+    {
+        printf("Erro ao abrir um dos arquivos de dados\n");
         exit(1);
     }
 
-    // Definir tamanho da base
     int TAMANHO_BASE;
-
-    printf("Qual o tamanho da base de dados (clientes e camisas)? ");
+    printf("Qual o tamanho da base de dados inicial (clientes e camisas)? ");
     scanf("%d", &TAMANHO_BASE);
 
-    // Cria base de Camisas e Clientes
+    // Cria as bases de dados
     criarBaseCamisa(arqCamisas, TAMANHO_BASE);
     criarBaseCliente(arqClientes, TAMANHO_BASE);
 
-    // Defina o tamanho da memória para a Seleção Natural
-    int M = 6; // Memória para Seleção Natural
-    int F = 5; // Vias (arquivos) para Intercalação Ótima
+    // Constrói a tabela hash a partir dos dados recém-criados
+    construir_hash_da_base_existente(arq_hash_clientes, arqClientes);
+    imprimir_tabela_hash_completa(arq_hash_clientes, arqClientes);
+
+    int M = 6;
+    int F = 5;
     int opcao;
+
     do
     {
         menu();
@@ -295,6 +316,66 @@ int main()
             printf("Base de clientes embaralhada com sucesso!\n");
             break;
         }
+        case 16:
+        {
+            int opcao_hash;
+            do
+            {
+                menu_hash();
+                scanf("%d", &opcao_hash);
+                switch (opcao_hash)
+                {
+                case 1:
+                {
+                    // ALTERAÇÃO: Chamando a nova função de interface correta
+                    inserir_novo_cliente_hash(arq_hash_clientes, arqClientes);
+                    break;
+                }
+                case 2:
+                {
+                    int cod_cliente;
+                    printf("Digite o código do cliente a buscar: ");
+                    scanf("%d", &cod_cliente);
+                    TCliente *cliente_encontrado = buscar_cliente_hash(cod_cliente, arq_hash_clientes, arqClientes);
+                    if (cliente_encontrado != NULL)
+                    {
+                        imprimeCliente(cliente_encontrado);
+                        free(cliente_encontrado);
+                    }
+                    else
+                    {
+                        printf("Cliente não encontrado na tabela hash.\n");
+                    }
+                    break;
+                }
+                case 3:
+                {
+                    int cod_cliente;
+                    printf("Digite o código do cliente a remover: ");
+                    scanf("%d", &cod_cliente);
+                    remover_cliente_hash(cod_cliente, arq_hash_clientes, arqClientes);
+                    break;
+                }
+                case 4:
+                {
+                    imprimir_tabela_hash_completa(arq_hash_clientes, arqClientes);
+                    break;
+                }
+                case 5:
+                {
+                    ImprimirBaseCliente(arqClientes);
+                    break;
+                }
+                case 0:
+                    printf("Voltando ao menu principal...\n");
+                    break;
+                default:
+                    printf("Opção do menu hash inválida!\n");
+                }
+            } while (opcao_hash != 0);
+            break; // Break do case 16
+        }
+
         case 0:
             printf("Saindo...\n");
             break;
@@ -304,11 +385,10 @@ int main()
         }
     } while (opcao != 0);
 
-    // Fechar arquivos
     fclose(arqClientes);
     fclose(arqCamisas);
     fclose(arqPedidos);
     fclose(log);
-
+    fclose(arq_hash_clientes);
     return 0;
 }
